@@ -1,0 +1,13 @@
+.path-node {
+  animation: scaleAnimation 1s infinite ease-in-out;
+}
+
+@keyframes scaleAnimation {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.5);
+  }
+}
