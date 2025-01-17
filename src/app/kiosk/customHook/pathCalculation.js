@@ -25,7 +25,7 @@ export const calculateShortestPathWithEdges = (svgElement) => {
   
     // Find the start node (kiosk) and end node (a specific rectangle).
     const startNode = nodes.find((node) => node.id === "kiosk");
-    const endNode = nodes.find((node) => node.id === "Rectangle 73");
+    const endNode = nodes.find((node) => node.id === "Rectangle 532");
   
     // If the start or end node isn't found, log an error and return an empty path.
     if (!startNode || !endNode) {
