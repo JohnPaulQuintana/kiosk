@@ -21,7 +21,7 @@ export const calculateShortestPathWithEdges = (svgElement) => {
     }
   
     const startNode = nodes.find((node) => node.id === "kiosk");
-    const endNode = nodes.find((node) => node.id === "Rectangle 89");
+    const endNode = nodes.find((node) => node.id === "Rectangle 73");
   
     if (!startNode || !endNode) {
       console.error("Start or End node not found.");
@@ -31,7 +31,7 @@ export const calculateShortestPathWithEdges = (svgElement) => {
     return calculateShortestPath(nodes, startNode, endNode);
   };
   
-  const calculateShortestPath = (nodes, startNode, endNode) => {
+  const calculateShortestPath = (nodes, startNode, endNode) => {                     
     const distances = {};
     const previous = {};
     const unvisited = new Set(nodes.map((node) => node.id));
@@ -57,7 +57,7 @@ export const calculateShortestPathWithEdges = (svgElement) => {
           id: node.id,
           distance: getDistance(currentNode, node),
         }))
-        .filter((neighbor) => neighbor.distance < 25);
+        .filter((neighbor) => neighbor.distance < 14);
   
       neighbors.forEach((neighbor) => {
         if (!unvisited.has(neighbor.id)) return;

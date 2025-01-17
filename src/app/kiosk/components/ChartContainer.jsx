@@ -33,11 +33,11 @@ const ChartContainer = () => {
       const myChart = echarts.init(dom, "", { renderer: "svg" });
 
       const ROOT_PATH = "maps/";
-      $.get(`${ROOT_PATH}ground_level.svg`, (svg) => {
+      $.get(`${ROOT_PATH}ground_level_version2.svg`, (svg) => {
         console.log("SVG Data:", svg); // Log to ensure the SVG data is loaded
         echarts.registerMap("CustomMap", { svg });
 
-        const routeCoords = shortestPath.map((item) => [item.x + 5, item.y + 5]);
+        const routeCoords = shortestPath.map((item) => [item.x + 2, item.y + 2]);
         console.log("Route Coordinates:", routeCoords);
 
         const option = {
@@ -88,7 +88,7 @@ const ChartContainer = () => {
   return (
     <div>
       {/* SVGLoader component */}
-      <SVGLoader filePath={"maps/ground_level.svg"} onLoad={handleSVGLoad} />
+      <SVGLoader filePath={"maps/ground_level_version2.svg"} onLoad={handleSVGLoad} />
 
       {/* Only render chart container once SVG is loaded */}
       {svgLoaded && (

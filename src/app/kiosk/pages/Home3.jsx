@@ -12,7 +12,7 @@ const Home = () => {
   return (
     <div className="p-4">
       {/* Pass the handleSVGLoad function as the onLoad prop to SVGLoader */}
-      <SVGLoader filePath={"maps/ground_level.svg"} onLoad={handleSVGLoad} />
+      <SVGLoader filePath={"maps/ground_level_version2.svg"} onLoad={handleSVGLoad} />
       
       <div className="grid grid-cols-3">
             <div></div>
