@@ -33,7 +33,7 @@ const ChartContainer = () => {
       const myChart = echarts.init(dom, "", { renderer: "svg" });
 
       const ROOT_PATH = "maps/";
-      $.get(`${ROOT_PATH}ground_level_version2.svg`, (svg) => {
+      $.get(`${ROOT_PATH}ground_level.svg`, (svg) => {
         console.log("SVG Data:", svg); // Log to ensure the SVG data is loaded
         echarts.registerMap("CustomMap", { svg });
 
@@ -46,6 +46,8 @@ const ChartContainer = () => {
           geo: {
             map: "CustomMap",
             roam: true,
+            center: routeCoords[Math.floor(routeCoords.length / 2)], // Start at the first position
+            zoom: 4, // Initial zoom level
             emphasis: { itemStyle: { color: undefined }, label: { show: false } },
           },
           series: [
@@ -76,6 +78,35 @@ const ChartContainer = () => {
         console.log("Initializing ECharts...");
         myChart.setOption(option);
         console.log("Chart initialized successfully!");
+
+        // Loop through routeCoords to update the center dynamically
+    //   let currentIndex = 0;
+
+    //   const focusNextCoordinate = () => {
+    //     if (currentIndex >= routeCoords.length) {
+    //       currentIndex = 0; // Reset to the first coordinate after the last one
+    //     }
+
+    //     // Update the chart center to the next coordinate
+    //     myChart.setOption({
+    //       geo: {
+    //         center: routeCoords[currentIndex], // Focus on the current coordinate
+    //         zoom: 4, // Optional: Adjust zoom level if needed
+    //       },
+          
+    //     });
+
+    //     console.log(`Focusing on coordinate: ${routeCoords[currentIndex]}`);
+
+    //     currentIndex++;
+
+    //     // Schedule the next update
+    //     setTimeout(focusNextCoordinate, 50); // Adjust delay as needed (e.g., 2000ms = 2 seconds)
+    //   };
+
+    //   // Start the loop
+    //   focusNextCoordinate();
+
       });
     };
 
@@ -88,7 +119,7 @@ const ChartContainer = () => {
   return (
     <div>
       {/* SVGLoader component */}
-      <SVGLoader filePath={"maps/ground_level_version2.svg"} onLoad={handleSVGLoad} />
+      <SVGLoader filePath={"maps/ground_level.svg"} onLoad={handleSVGLoad} />
 
       {/* Only render chart container once SVG is loaded */}
       {svgLoaded && (
