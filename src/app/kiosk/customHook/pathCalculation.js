@@ -21,7 +21,7 @@ export const calculateShortestPathWithEdges = (svgElement) => {
     }
   
     const startNode = nodes.find((node) => node.id === "kiosk");
-    const endNode = nodes.find((node) => node.id === "Rectangle 73");
+    const endNode = nodes.find((node) => node.id === "Rectangle 79");
   
     if (!startNode || !endNode) {
       console.error("Start or End node not found.");

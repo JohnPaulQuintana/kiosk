@@ -14,8 +14,8 @@ const Home = () => {
       {/* Pass the handleSVGLoad function as the onLoad prop to SVGLoader */}
       <SVGLoader filePath={"maps/ground_level_version2.svg"} onLoad={handleSVGLoad} />
       
-      <div className="grid grid-cols-1 md:grid-cols-3">
-            <div></div>
+      <div className="grid grid-cols-1">
+            {/* <div></div> */}
             {/* Pass svgLoaded state to ChartContainer to control when it initializes */}
             <div className="col-span-2">
                 {svgLoaded && <ChartContainer />}
