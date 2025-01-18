@@ -129,11 +129,12 @@ const NavigationPage = () => {
                 <div className="col-span-3 lg:col-span-2">
                     {/* Mobile Hamburger Button */}
                     <button
-                        className="lg:hidden absolute top-4 left-4 z-50 p-2 bg-green-500 text-white rounded-md"
+                        className="lg:hidden absolute top-12 z-50 p-1 ps-4 bg-green-500 text-white rounded-sm animate-pulse"
                         onClick={() => setIsSidebarOpen(!isSidebarOpen)}
                     >
-                        <i className="fa-solid fa-bars"></i>
+                        <i className={`fa-solid ${isSidebarOpen ? 'fa-chevrons-left' : 'fa-chevrons-right'}`}></i>
                     </button>
+
 
                     {svgLoaded && <ChartContainer target={selectedItem} />}
                 </div>

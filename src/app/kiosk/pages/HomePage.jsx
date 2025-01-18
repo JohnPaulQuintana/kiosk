@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import SVGLoader from "../components/SVGLoader";
 import ChartContainer from "../components/ChartContainer";
-import HeaderSection from "../components/kiosk/header";
 import MainSection from "../components/kiosk/Main";
 import Footer from "../components/kiosk/footer";
+import HeaderSection from "../components/kiosk/Header";
 
 const HomePage = () => {
   const [svgLoaded, setSvgLoaded] = useState(false); // Track the loading state of SVG
@@ -20,7 +20,7 @@ const HomePage = () => {
       {/* body */}
       <MainSection />
 
-      <Footer />
+      {/* <Footer /> */}
       {/* Pass the handleSVGLoad function as the onLoad prop to SVGLoader */}
       <SVGLoader filePath={"maps/ground_level.svg"} onLoad={handleSVGLoad} />
     </div>
