@@ -6,7 +6,14 @@ import facilities from "../data/facilities";
 
 const NavigationPage = () => {
     const [activeNav, setActiveNav] = useState("facilities");
-    const [selectedItem, setSelectedItem] = useState("kiosk");
+    // const [selectedItem, setSelectedItem] = useState("kiosk");
+    const [selectedItem, setSelectedItem] = useState({
+        id: "kiosk",
+        name: "",
+        availability: true,
+        floor: "Ground Floor",
+        image: "",
+    });
     const [svgLoaded, setSvgLoaded] = useState(false);
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
@@ -67,36 +74,47 @@ const NavigationPage = () => {
                                     <div>
                                         {facilities.map((facility, index) => (
                                             <div
-                                                className={`${selectedItem === facility.id ? "bg-green-500" : ""
+                                                className={`${selectedItem.id === facility.id ? "bg-green-500" : ""
                                                     } p-2 mb-4 shadow rounded-md flex items-center justify-between transform transition-transform duration-300 hover:scale-105`}
                                                 key={index}
                                             >
                                                 <div className="w-[80%]">
                                                     <span
-                                                        className={`${selectedItem === facility.id ? "text-white" : "text-slate-500"
+                                                        className={`${selectedItem.id === facility.id ? "text-white" : "text-slate-500"
                                                             } text-xs`}
                                                     >
                                                         <i
-                                                            className={`${selectedItem === facility.id ? "text-white" : "text-green-500"
+                                                            className={`${selectedItem.id === facility.id ? "text-white" : "text-green-500"
                                                                 } fa-solid fa-circle opacity-80 text-xs`}
                                                         ></i>{" "}
                                                         <span className="">{facility.floor}</span>
                                                     </span>
                                                     <span
-                                                        className={`${selectedItem === facility.id ? "text-white" : "text-black"
+                                                        className={`${selectedItem.id === facility.id ? "text-white" : "text-black"
                                                             } block ps-4`}
                                                     >
                                                         {facility.name}
                                                     </span>
-                                                    <div className="flex gap-2 items-center ps-4">
+                                                    <div className="flex gap-2 items-center ps-4 mt-2">
                                                         <button
-                                                            onClick={() => handleUserClicked(facility.id)}
+                                                            onClick={() => handleUserClicked(facility)}
                                                             type="button"
                                                             className={`text-xs bg-green-500 border border-white rounded-sm text-white p-1 ${facility.availability ? "" : "hidden"
                                                                 }`}
                                                         >
                                                             Navigate
                                                         </button>
+
+                                                        {selectedItem.id === facility.id && (
+                                                            <span class="flex items-center">
+                                                            <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 0116 0h2a10 10 0 10-20 0h2z"></path>
+                                                            </svg>
+                                                            <span className="ml-2 text-white text-[9px] capitalize">Navigating to your {facility.name}...</span>
+                                                        </span>
+                                                        )}
+
                                                     </div>
                                                 </div>
                                                 <div className="border rounded-md w-16 h-16 overflow-hidden">

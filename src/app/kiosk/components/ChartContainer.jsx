@@ -3,8 +3,12 @@ import * as echarts from "echarts";
 import $ from "jquery";
 import { calculateShortestPathWithEdges } from "../customHook/pathCalculation";
 import SVGLoader from "../components/SVGLoader"; // Import the SVGLoader
+import InformationModal from "./kiosk/popups/Information";
 
 const ChartContainer = ({ target }) => {
+  const [modalData, setModalData] = useState(null); // State to manage modal data
+  const [isModalOpen, setIsModalOpen] = useState(false); // State to manage modal visibility
+
   // console.log(target)
   const [svgLoaded, setSvgLoaded] = useState(false); // State to track SVG loading
 
@@ -25,7 +29,7 @@ const ChartContainer = ({ target }) => {
         return;
       }
 
-      const { shortestPath } = calculateShortestPathWithEdges(svgElement, target);
+      const { shortestPath } = calculateShortestPathWithEdges(svgElement, target.id);
 
       if (!shortestPath || shortestPath.length === 0) {
         console.error("Shortest path not found.");
@@ -40,6 +44,7 @@ const ChartContainer = ({ target }) => {
         echarts.registerMap("CustomMap", { svg });
 
         const routeCoords = shortestPath.map((item) => [item.x + 2, item.y + 2]);
+        console.log(routeCoords[Math.floor(routeCoords.length / 2)])
         const targetCoord = routeCoords[routeCoords.length - 1]; // Get the last coordinate for the target
 
         // console.log("Route Coordinates:", routeCoords);
@@ -50,7 +55,7 @@ const ChartContainer = ({ target }) => {
           geo: {
             map: "CustomMap",
             roam: true,
-            center: routeCoords[Math.floor(routeCoords.length / 2)],
+            center: routeCoords[routeCoords.length - 1],
             zoom: 4,
             emphasis: { itemStyle: { color: undefined }, label: { show: true } },
           },
@@ -77,32 +82,95 @@ const ChartContainer = ({ target }) => {
               data: [{ coords: routeCoords }],
             },
             {
-              name: "Target Destination",
+              name: target.id,
               type: "scatter", // Use scatter for markers
-              coordinateSystem: "geo",
-              symbol: "pin", // Use pin as marker
-              symbolSize: 20,
+              coordinateSystem: "geo", // Specifies that the map uses geographic coordinates (latitude, longitude)
+              symbol: "pin", // Pin is used as the marker symbol
+              symbolSize: 20, // Size of the pin symbol
+              itemStyle: {
+                color: "#0D832C", // Green color for the target pin
+                borderColor: "#fff", // White border around the pin
+                borderWidth: 2, // Width of the border
+                opacity: 0.8, // Transparency of the marker
+              },
+              label: {
+                show: true, // Display a label
+                position: "top", // Position of the label relative to the pin
+                formatter: `{b}`, // Display the name of the target
+                fontSize: 12, // Font size for the label
+                color: "#fff", // Color of the label text
+                fontWeight: "bold", // Bold font weight on hover
+                padding: [5, 10, 5, 10], // Padding around the label
+                backgroundColor: "rgba(0, 0, 0, 0.7)", // Background color of the label with transparency
+                borderRadius: 5, // Rounded corners of the label background
+              },
+              tooltip: {
+                show: false, // Enable the tooltip
+                formatter: `{b}
+                  <div class="flex flex-col items-center">
+                    <span class="text-xs">${target.floor}</span>
+                  </div>`, // Tooltip content with coordinates
+                backgroundColor: "rgba(0, 0, 0, 0.7)", // Background color of the tooltip
+                borderColor: "#fff", // Border color of the tooltip
+                borderWidth: 1, // Border width of the tooltip
+                padding: [10, 15], // Padding for the tooltip
+                textStyle: {
+                  color: "#fff", // Color of the text inside the tooltip
+                  fontSize: 14, // Font size for the tooltip text
+                },
+              },
               data: [
                 {
-                  name: "Target",
-                  value: targetCoord, // Last coordinate in the route as the target
+                  name: target.name, // Name of the target point
+                  value: targetCoord, // The coordinates [longitude, latitude] of the target destination
                 },
               ],
-              itemStyle: {
-                color: "#0D832C", // Red color for the target
+              emphasis: {
+                itemStyle: {
+                  // color: "#FF6347", // Color when the target is hovered (use a different color on hover)
+                },
+                label: {
+                  show: true, // Show label when the marker is hovered
+                  // color: "#FF6347", // Color of the label when hovered
+                  fontWeight: "bold", // Bold font weight on hover
+                },
               },
-            },
+            }
+
           ],
         };
 
         myChart.setOption(option);
+
+        // Event listener for user click on marker
+        myChart.on('click', function (params) {
+          if (params.componentType === 'series' && params.seriesName === target.id) {
+            // Check if it's a click on the Target Destination marker
+            const clickedTarget = params.data; // This contains data of the clicked target pin
+
+            // Extract relevant information
+            const targetName = clickedTarget.name;
+            const targetCoordinates = clickedTarget.value;
+
+            // Do something with the clicked target data
+            console.log('Clicked target:', targetName);
+
+            // Trigger any other action here, such as updating UI or sending data
+            // Set modal data and open modal
+            setModalData(target);
+            setIsModalOpen(true);
+
+            // alert(`You clicked on ${targetName} at coordinates: (${longitude}, ${latitude})`);
+          }
+        });
+
       });
     };
 
     // Initialize chart only after SVG is loaded and target changes
     if (svgLoaded) {
       initializeChart();
-       
+
     }
   }, [svgLoaded, target]); // Include `target` as a dependency
 
@@ -118,6 +186,12 @@ const ChartContainer = ({ target }) => {
           className="w-full h-screen border rounded-md p-2 shadow mt-16"
         // style={{ width: "100%", height: "100vh", border: "1px solid #ccc" }}
         />
+      )}
+
+      {/* popups */}
+      {/* Modal */}
+      {isModalOpen && (
+        <InformationModal data={target} onClose={() => setIsModalOpen(false)} />
       )}
     </div>
   );
