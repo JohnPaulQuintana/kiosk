@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import SVGLoader from "../components/SVGLoader";
 import ChartContainer from "../components/ChartContainer";
-import MainSection from "../components/kiosk/Main";
+import MainSection from "../components/kiosk/MainSection";
 // import Footer from "../components/kiosk/footer";
 import HeaderSection from "../components/kiosk/HeaderSection";
 
