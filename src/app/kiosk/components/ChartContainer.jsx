@@ -4,7 +4,8 @@ import $ from "jquery";
 import { calculateShortestPathWithEdges } from "../customHook/pathCalculation";
 import SVGLoader from "../components/SVGLoader"; // Import the SVGLoader
 
-const ChartContainer = () => {
+const ChartContainer = ({ target }) => {
+  // console.log(target)
   const [svgLoaded, setSvgLoaded] = useState(false); // State to track SVG loading
 
   // This function is triggered once the SVG is loaded
@@ -13,16 +14,18 @@ const ChartContainer = () => {
   };
 
   useEffect(() => {
+    let myChart; // Declare chart instance to use in cleanup
+
     const initializeChart = async () => {
       const svgElement = document.querySelector("#svgContainer svg");
-      console.log("SVG Element:", svgElement); // Log SVG element to check if it's loaded correctly
+      console.log("SVG Element:", svgElement);
 
       if (!svgElement) {
         console.error("SVG not loaded yet.");
         return;
       }
 
-      const { shortestPath } = calculateShortestPathWithEdges(svgElement);
+      const { shortestPath } = calculateShortestPathWithEdges(svgElement, target);
 
       if (!shortestPath || shortestPath.length === 0) {
         console.error("Shortest path not found.");
@@ -30,25 +33,26 @@ const ChartContainer = () => {
       }
 
       const dom = document.getElementById("chart-container");
-      const myChart = echarts.init(dom, "", { renderer: "svg" });
+      myChart = echarts.init(dom, "", { renderer: "svg" });
 
       const ROOT_PATH = "maps/";
       $.get(`${ROOT_PATH}ground_level.svg`, (svg) => {
-        console.log("SVG Data:", svg); // Log to ensure the SVG data is loaded
         echarts.registerMap("CustomMap", { svg });
 
         const routeCoords = shortestPath.map((item) => [item.x + 2, item.y + 2]);
-        console.log("Route Coordinates:", routeCoords);
+        const targetCoord = routeCoords[routeCoords.length - 1]; // Get the last coordinate for the target
+
+        // console.log("Route Coordinates:", routeCoords);
 
         const option = {
-          title: { text: "Level 1", left: "center", bottom: 10 },
+          title: { text: "Ground Floor", left: "center", bottom: 10 },
           tooltip: {},
           geo: {
             map: "CustomMap",
             roam: true,
-            center: routeCoords[Math.floor(routeCoords.length / 2)], // Start at the first position
-            zoom: 4, // Initial zoom level
-            emphasis: { itemStyle: { color: undefined }, label: { show: false } },
+            center: routeCoords[Math.floor(routeCoords.length / 2)],
+            zoom: 4,
+            emphasis: { itemStyle: { color: undefined }, label: { show: true } },
           },
           series: [
             {
@@ -68,53 +72,39 @@ const ChartContainer = () => {
                 constantSpeed: 50,
                 trailLength: 0,
                 symbolSize: [20, 12],
-                symbol:'path://M35.5 40.5c0-22.16 17.84-40 40-40s40 17.84 40 40c0 1.6939-.1042 3.3626-.3067 5H35.8067c-.2025-1.6374-.3067-3.3061-.3067-5zm90.9621-2.6663c-.62-1.4856-.9621-3.1182-.9621-4.8337 0-6.925 5.575-12.5 12.5-12.5s12.5 5.575 12.5 12.5a12.685 12.685 0 0 1-.1529 1.9691l.9537.5506-15.6454 27.0986-.1554-.0897V65.5h-28.7285c-7.318 9.1548-18.587 15-31.2715 15s-23.9535-5.8452-31.2715-15H15.5v-2.8059l-.0937.0437-8.8727-19.0274C2.912 41.5258.5 37.5549.5 33c0-6.925 5.575-12.5 12.5-12.5S25.5 26.075 25.5 33c0 .9035-.0949 1.784-.2753 2.6321L29.8262 45.5h92.2098z'
+                symbol: "path://M35.5 40.5c0-22.16 17.84-40 40-40s40 17.84 40 40c0 1.6939-.1042 3.3626-.3067 5H35.8067c-.2025-1.6374-.3067-3.3061-.3067-5zm90.9621-2.6663c-.62-1.4856-.9621-3.1182-.9621-4.8337 0-6.925 5.575-12.5 12.5-12.5s12.5 5.575 12.5 12.5a12.685 12.685 0 0 1-.1529 1.9691l.9537.5506-15.6454 27.0986-.1554-.0897V65.5h-28.7285c-7.318 9.1548-18.587 15-31.2715 15s-23.9535-5.8452-31.2715-15H15.5v-2.8059l-.0937.0437-8.8727-19.0274C2.912 41.5258.5 37.5549.5 33c0-6.925 5.575-12.5 12.5-12.5S25.5 26.075 25.5 33c0 .9035-.0949 1.784-.2753 2.6321L29.8262 45.5h92.2098z",
               },
               data: [{ coords: routeCoords }],
+            },
+            {
+              name: "Target Destination",
+              type: "scatter", // Use scatter for markers
+              coordinateSystem: "geo",
+              symbol: "pin", // Use pin as marker
+              symbolSize: 20,
+              data: [
+                {
+                  name: "Target",
+                  value: targetCoord, // Last coordinate in the route as the target
+                },
+              ],
+              itemStyle: {
+                color: "#0D832C", // Red color for the target
+              },
             },
           ],
         };
 
-        console.log("Initializing ECharts...");
         myChart.setOption(option);
-        console.log("Chart initialized successfully!");
-
-        // Loop through routeCoords to update the center dynamically
-    //   let currentIndex = 0;
-
-    //   const focusNextCoordinate = () => {
-    //     if (currentIndex >= routeCoords.length) {
-    //       currentIndex = 0; // Reset to the first coordinate after the last one
-    //     }
-
-    //     // Update the chart center to the next coordinate
-    //     myChart.setOption({
-    //       geo: {
-    //         center: routeCoords[currentIndex], // Focus on the current coordinate
-    //         zoom: 4, // Optional: Adjust zoom level if needed
-    //       },
-          
-    //     });
-
-    //     console.log(`Focusing on coordinate: ${routeCoords[currentIndex]}`);
-
-    //     currentIndex++;
-
-    //     // Schedule the next update
-    //     setTimeout(focusNextCoordinate, 50); // Adjust delay as needed (e.g., 2000ms = 2 seconds)
-    //   };
-
-    //   // Start the loop
-    //   focusNextCoordinate();
-
       });
     };
 
-    // Initialize chart only after SVG has been loaded
+    // Initialize chart only after SVG is loaded and target changes
     if (svgLoaded) {
       initializeChart();
+       
     }
-  }, [svgLoaded]); // Only run when svgLoaded is true
+  }, [svgLoaded, target]); // Include `target` as a dependency
 
   return (
     <div>
@@ -125,7 +115,8 @@ const ChartContainer = () => {
       {svgLoaded && (
         <div
           id="chart-container"
-          style={{ width: "100%", height: "90vh", border: "1px solid #ccc" }}
+          className="w-full h-screen border rounded-md p-2 shadow mt-16"
+        // style={{ width: "100%", height: "100vh", border: "1px solid #ccc" }}
         />
       )}
     </div>

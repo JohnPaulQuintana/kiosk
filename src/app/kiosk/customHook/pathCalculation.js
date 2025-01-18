@@ -1,9 +1,9 @@
 // Main function to calculate the shortest path with edges.
-export const calculateShortestPathWithEdges = (svgElement) => {
+export const calculateShortestPathWithEdges = (svgElement, target) => {
     const nodes = [];  // Array to store the nodes (rectangles and kiosk).
     const pathGroup = svgElement.querySelector("#Path"); // Find the path group in the SVG.
     const kiosk = svgElement.querySelector("#kiosk"); // Find the kiosk node in the SVG.
-  
+
     // Process the path group (all rectangles within the path).
     if (pathGroup) {
         const rects = pathGroup.querySelectorAll("rect"); // Get all rectangles.
@@ -25,14 +25,21 @@ export const calculateShortestPathWithEdges = (svgElement) => {
   
     // Find the start node (kiosk) and end node (a specific rectangle).
     const startNode = nodes.find((node) => node.id === "kiosk");
-    const endNode = nodes.find((node) => node.id === "Rectangle 532");
+    const endNode = nodes.find((node) => node.id === target);
   
+    console.log(endNode)
+    // Modify the `endNode` color property
+    endNode.color = "orange"; // Set the color for the endNode (or any other property needed for ECharts)
+    
+    
+    // endNode.setAttribute('fill','orange')
     // If the start or end node isn't found, log an error and return an empty path.
     if (!startNode || !endNode) {
         console.error("Start or End node not found.");
         return { shortestPath: [], totalDistance: 0 };
     }
-  
+
+
     // Call the function to calculate the shortest path.
     return calculateShortestPath(nodes, startNode, endNode);
 };
