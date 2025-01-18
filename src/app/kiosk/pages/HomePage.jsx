@@ -2,8 +2,8 @@ import React, { useState } from "react";
 import SVGLoader from "../components/SVGLoader";
 import ChartContainer from "../components/ChartContainer";
 import MainSection from "../components/kiosk/Main";
-import Footer from "../components/kiosk/footer";
-import HeaderSection from "../components/kiosk/Header";
+// import Footer from "../components/kiosk/footer";
+import HeaderSection from "../components/kiosk/HeaderSection";
 
 const HomePage = () => {
   const [svgLoaded, setSvgLoaded] = useState(false); // Track the loading state of SVG

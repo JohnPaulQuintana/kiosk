@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import SVGLoader from "../components/SVGLoader";
 import ChartContainer from "../components/ChartContainer";
-import HeaderSection from "../components/kiosk/header";
+import HeaderSection from "../components/kiosk/HeaderSection";
 import facilities from "../data/facilities";
 
 const NavigationPage = () => {
