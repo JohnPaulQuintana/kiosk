@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import * as echarts from "echarts";
 import $ from "jquery";
 import { calculateShortestPathWithEdges } from "../customHook/pathCalculation";
@@ -6,16 +6,17 @@ import SVGLoader from "../components/SVGLoader"; // Import the SVGLoader
 import InformationModal from "./kiosk/popups/Information";
 
 const ChartContainer = ({ target }) => {
+  console.log(target.id)
   const [modalData, setModalData] = useState(null); // State to manage modal data
   const [isModalOpen, setIsModalOpen] = useState(false); // State to manage modal visibility
 
   // console.log(target)
   const [svgLoaded, setSvgLoaded] = useState(false); // State to track SVG loading
 
-  // This function is triggered once the SVG is loaded
-  const handleSVGLoad = () => {
-    setSvgLoaded(true); // Set SVG as loaded
-  };
+  // Prevent multiple calls to handleSVGLoad
+  const handleSVGLoad = useCallback(() => {
+    setSvgLoaded(true);
+  }, []);
 
   useEffect(() => {
     let myChart; // Declare chart instance to use in cleanup
@@ -30,7 +31,7 @@ const ChartContainer = ({ target }) => {
       }
 
       const { shortestPath } = calculateShortestPathWithEdges(svgElement, target.id);
-
+      console.log(shortestPath)
       if (!shortestPath || shortestPath.length === 0) {
         console.error("Shortest path not found.");
         return;
@@ -40,11 +41,11 @@ const ChartContainer = ({ target }) => {
       myChart = echarts.init(dom, "", { renderer: "svg" });
 
       const ROOT_PATH = "maps/";
-      $.get(`${ROOT_PATH}ground_level.svg`, (svg) => {
+      $.get(`${ROOT_PATH}ground_floor.svg`, (svg) => {
         echarts.registerMap("CustomMap", { svg });
 
         const routeCoords = shortestPath.map((item) => [item.x + 2, item.y + 2]);
-        console.log(routeCoords[Math.floor(routeCoords.length / 2)])
+        console.log(routeCoords)
         const targetCoord = routeCoords[routeCoords.length - 1]; // Get the last coordinate for the target
 
         // console.log("Route Coordinates:", routeCoords);
@@ -145,16 +146,6 @@ const ChartContainer = ({ target }) => {
         // Event listener for user click on marker
         myChart.on('click', function (params) {
           if (params.componentType === 'series' && params.seriesName === target.id) {
-            // Check if it's a click on the Target Destination marker
-            const clickedTarget = params.data; // This contains data of the clicked target pin
-
-            // Extract relevant information
-            const targetName = clickedTarget.name;
-            const targetCoordinates = clickedTarget.value;
-
-            // Do something with the clicked target data
-            console.log('Clicked target:', targetName);
-
             // Trigger any other action here, such as updating UI or sending data
             // Set modal data and open modal
             setModalData(target);
@@ -168,16 +159,17 @@ const ChartContainer = ({ target }) => {
     };
 
     // Initialize chart only after SVG is loaded and target changes
-    if (svgLoaded) {
-      initializeChart();
-
-    }
+    if (svgLoaded) initializeChart();
+    return () => {
+      // Cleanup chart instance to avoid memory leaks
+      if (myChart) myChart.dispose();
+    };
   }, [svgLoaded, target]); // Include `target` as a dependency
 
   return (
     <div>
       {/* SVGLoader component */}
-      <SVGLoader filePath={"maps/ground_level.svg"} onLoad={handleSVGLoad} />
+      <SVGLoader filePath={"maps/ground_floor.svg"} onLoad={handleSVGLoad} />
 
       {/* Only render chart container once SVG is loaded */}
       {svgLoaded && (

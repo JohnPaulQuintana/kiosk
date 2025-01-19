@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import SVGLoader from "../components/SVGLoader";
 import ChartContainer from "../components/ChartContainer";
 import HeaderSection from "../components/kiosk/HeaderSection";
@@ -16,14 +16,28 @@ const NavigationPage = () => {
     });
     const [svgLoaded, setSvgLoaded] = useState(false);
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+    const [floorData, setFloorData] = useState([])
 
+    useEffect(() => {
+        const savedFormattedIds = JSON.parse(localStorage.getItem('floor-data'));
+        if (savedFormattedIds) {
+            // console.log("Loaded IDs from localStorage:", savedFormattedIds);
+            setFloorData(savedFormattedIds);
+        } else {
+            console.log("No data found in localStorage.");
+        }
+    }, []); // Empty dependency array ensures it runs only once
+
+    
     const handleSVGLoad = () => {
         setSvgLoaded(true);
+
     };
 
-    const handleUserClicked = (target) => {
+    const handleUserClicked = useCallback((target) => {
         setSelectedItem(target);
-    };
+    }, []);
+    
 
     return (
         <div className="w-full h-screen relative">
@@ -72,7 +86,7 @@ const NavigationPage = () => {
                             <div className="border p-2 max-h-[80vh] overflow-y-auto shadow scrollable-content">
                                 {activeNav === "facilities" && (
                                     <div>
-                                        {facilities.map((facility, index) => (
+                                        {floorData.map((facility, index) => (
                                             <div
                                                 className={`${selectedItem.id === facility.id ? "bg-green-500" : ""
                                                     } p-2 mb-4 shadow rounded-md flex items-center justify-between transform transition-transform duration-300 hover:scale-105`}
@@ -106,13 +120,13 @@ const NavigationPage = () => {
                                                         </button>
 
                                                         {selectedItem.id === facility.id && (
-                                                            <span class="flex items-center">
-                                                            <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                                                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 0116 0h2a10 10 0 10-20 0h2z"></path>
-                                                            </svg>
-                                                            <span className="ml-2 text-white text-[9px] capitalize">Navigating to your {facility.name}...</span>
-                                                        </span>
+                                                            <span className="flex items-center">
+                                                                <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 0116 0h2a10 10 0 10-20 0h2z"></path>
+                                                                </svg>
+                                                                <span className="ml-2 text-white text-[9px] capitalize">Navigating to your {facility.name}...</span>
+                                                            </span>
                                                         )}
 
                                                     </div>

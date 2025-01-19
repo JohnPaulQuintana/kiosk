@@ -1,5 +1,6 @@
 // Main function to calculate the shortest path with edges.
 export const calculateShortestPathWithEdges = (svgElement, target) => {
+    console.log(target);
     const nodes = [];  // Array to store the nodes (rectangles and kiosk).
     const pathGroup = svgElement.querySelector("#Path"); // Find the path group in the SVG.
     const kiosk = svgElement.querySelector("#kiosk"); // Find the kiosk node in the SVG.
@@ -14,7 +15,7 @@ export const calculateShortestPathWithEdges = (svgElement, target) => {
             nodes.push({ id, x, y });  // Add node with ID and coordinates to the nodes array.
         });
     }
-  
+
     // Process the kiosk (the starting point).
     if (kiosk) {
         const id = kiosk.id || "kiosk";  // Default to "kiosk" if no ID is found.
@@ -22,54 +23,65 @@ export const calculateShortestPathWithEdges = (svgElement, target) => {
         const y = parseFloat(kiosk.getAttribute("y")) || 0;  // Get the y-coordinate.
         nodes.push({ id, x, y });  // Add the kiosk node to the nodes array.
     }
-  
+    console.log(nodes);
+
     // Find the start node (kiosk) and end node (a specific rectangle).
     const startNode = nodes.find((node) => node.id === "kiosk");
+    console.log(startNode);
     const endNode = nodes.find((node) => node.id === target);
-  
-    console.log(endNode)
-    // Modify the `endNode` color property
-    endNode.color = "orange"; // Set the color for the endNode (or any other property needed for ECharts)
+
+    console.log(endNode);
     
-    
-    // endNode.setAttribute('fill','orange')
     // If the start or end node isn't found, log an error and return an empty path.
     if (!startNode || !endNode) {
         console.error("Start or End node not found.");
         return { shortestPath: [], totalDistance: 0 };
     }
 
+    // Calculate an adaptive threshold based on the distance between nodes
+    const distances = nodes.map((node) => {
+        return {
+            node,
+            distance: getDistance(startNode, node)
+        };
+    });
+    const averageDistance = distances.reduce((sum, { distance }) => sum + distance, 0) / distances.length;
+    console.log(`Average Distance: ${averageDistance}`);
+    
+    // Set threshold as a percentage of the average distance (or adjust as necessary)
+    const threshold = Math.max(averageDistance * 100, 100);  // Set threshold to 20% of average distance, or a minimum of 10.
+    console.log(`Threshold: ${threshold}`);
 
     // Call the function to calculate the shortest path.
-    return calculateShortestPath(nodes, startNode, endNode);
+    return calculateShortestPath(nodes, startNode, endNode, threshold);
 };
-  
+
 // Function to calculate the shortest path using Dijkstra's algorithm.
-const calculateShortestPath = (nodes, startNode, endNode) => {
+const calculateShortestPath = (nodes, startNode, endNode, threshold) => {
     const distances = {};  // Object to store the shortest distance for each node.
     const previous = {};  // Object to store the previous node in the shortest path.
     const unvisited = new Set(nodes.map((node) => node.id)); // Set of unvisited nodes.
-  
+
     // Initialize all distances to infinity and previous nodes to null.
     nodes.forEach((node) => {
         distances[node.id] = Infinity;
         previous[node.id] = null;
     });
-  
+
     // Distance to the start node is 0.
     distances[startNode.id] = 0;
-  
+
     // Main loop of Dijkstra's algorithm.
     while (unvisited.size > 0) {
         // Find the unvisited node with the smallest distance.
         const currentNodeId = [...unvisited].reduce((closest, nodeId) =>
             !closest || distances[nodeId] < distances[closest] ? nodeId : closest
         );
-  
+
         // Stop if we reach the end node or if there's no more nodes to visit.
         if (!currentNodeId || currentNodeId === endNode.id) break;
         unvisited.delete(currentNodeId);
-  
+
         const currentNode = nodes.find((n) => n.id === currentNodeId);  // Get the current node.
         
         // Get the neighbors of the current node (nodes within a certain distance).
@@ -78,12 +90,12 @@ const calculateShortestPath = (nodes, startNode, endNode) => {
                 id: node.id,
                 distance: getDistance(currentNode, node), // Calculate distance to each neighbor.
             }))
-            .filter((neighbor) => neighbor.distance < 12); // Filter neighbors within 12 units of distance.
-  
+            .filter((neighbor) => neighbor.distance <= threshold); // Filter neighbors based on threshold.
+        
         // Loop through the neighbors and update distances.
         neighbors.forEach((neighbor) => {
             if (!unvisited.has(neighbor.id)) return;  // Skip visited neighbors.
-  
+
             const newDistance = distances[currentNodeId] + neighbor.distance;  // Calculate new distance.
             if (newDistance < distances[neighbor.id]) {  // If new distance is smaller, update.
                 distances[neighbor.id] = newDistance;
@@ -91,17 +103,17 @@ const calculateShortestPath = (nodes, startNode, endNode) => {
             }
         });
     }
-  
+
     // Backtrack from the end node to the start node to get the shortest path.
     const coords = [];
     let traceNodeId = endNode.id;
     let totalDistance = 0;
-  
+
     // Loop to trace the path from end to start using the previous nodes.
     while (traceNodeId) {
         const node = nodes.find((n) => n.id === traceNodeId);  // Get the node from the previous node ID.
         if (node) coords.unshift({ id: node.id, x: node.x, y: node.y, distance: totalDistance });  // Add node to path.
-  
+
         const prevNodeId = previous[traceNodeId];  // Get the previous node ID.
         if (prevNodeId) {
             const prevNode = nodes.find((n) => n.id === prevNodeId);  // Get the previous node.
@@ -109,14 +121,14 @@ const calculateShortestPath = (nodes, startNode, endNode) => {
         }
         traceNodeId = previous[traceNodeId];  // Move to the previous node.
     }
-  
+
     // Return the shortest path and total distance.
     return { shortestPath: coords, totalDistance };
 };
-  
+
 // Function to calculate the Euclidean distance between two nodes.
 const getDistance = (nodeA, nodeB) => {
-    const dx = nodeA.x - nodeB.x;  // Calculate the difference in x-coordinates.
-    const dy = nodeA.y - nodeB.y;  // Calculate the difference in y-coordinates.
-    return Math.sqrt(dx * dx + dy * dy);  // Return the Euclidean distance.
+    const dx = (nodeA.x - nodeB.x);  // Calculate the difference in x-coordinates.
+    const dy = (nodeA.y - nodeB.y);  // Calculate the difference in y-coordinates.
+    return Math.sqrt(dx * dx + dy * dy) - 12;  // Return the Euclidean distance.
 };

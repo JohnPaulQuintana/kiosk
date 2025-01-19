@@ -22,7 +22,7 @@ const HomePage = () => {
 
       {/* <Footer /> */}
       {/* Pass the handleSVGLoad function as the onLoad prop to SVGLoader */}
-      <SVGLoader filePath={"maps/ground_level.svg"} onLoad={handleSVGLoad} />
+      {/* <SVGLoader filePath={"maps/ground_floor.svg"} onLoad={handleSVGLoad} /> */}
     </div>
   );
 };
