@@ -1,14 +1,18 @@
 // Main function to calculate the shortest path with edges.
-export const calculateShortestPathWithEdges = (svgElement, target) => {
+export const calculateShortestPathWithEdges = (svgElement2, target) => {
     console.log(target);
     const nodes = [];  // Array to store the nodes (rectangles and kiosk).
-    const pathGroup = svgElement.querySelector("#Path"); // Find the path group in the SVG.
+    // const pathGroup = svgElement.querySelector("#Path"); // Find the path group in the SVG.
+    const svgElement = document.querySelector("#svgContainer svg");
+    const pathGroup = svgElement.querySelector(`[id="Path"]`);
+    console.log(pathGroup)
     const kiosk = svgElement.querySelector("#kiosk"); // Find the kiosk node in the SVG.
 
     // Process the path group (all rectangles within the path).
     if (pathGroup) {
         const rects = pathGroup.querySelectorAll("rect"); // Get all rectangles.
         rects.forEach((rect) => {
+            if(rect.id === "ground_guidance_counseling_door1") console.log(rect);
             const id = rect.id || "No ID";  // Default to "No ID" if no ID is found.
             const x = parseFloat(rect.getAttribute("x")) || 0;  // Get the x-coordinate.
             const y = parseFloat(rect.getAttribute("y")) || 0;  // Get the y-coordinate.
@@ -28,9 +32,9 @@ export const calculateShortestPathWithEdges = (svgElement, target) => {
     // Find the start node (kiosk) and end node (a specific rectangle).
     const startNode = nodes.find((node) => node.id === "kiosk");
     console.log(startNode);
-    const endNode = nodes.find((node) => node.id === target);
+    const endNode = nodes.find((node) => node.id.trim().toLowerCase() === target.trim().toLowerCase());
 
-    console.log(endNode);
+    console.log(endNode, target);
     
     // If the start or end node isn't found, log an error and return an empty path.
     if (!startNode || !endNode) {

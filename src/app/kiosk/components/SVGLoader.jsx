@@ -9,6 +9,8 @@ const SVGLoader = ({ filePath, onLoad }) => {
 
 
       const gElements = svgElement.querySelectorAll("g");
+      // const pElements = svgElement.querySelector("#Path")
+      // console.log(pElements)
       const gIds = Array.from(gElements)
         .map((g) => g.getAttribute("id")?.trim()) // Trim spaces
         .filter((id) => {

@@ -4,8 +4,13 @@ import $ from "jquery";
 import { calculateShortestPathWithEdges } from "../customHook/pathCalculation";
 import SVGLoader from "../components/SVGLoader"; // Import the SVGLoader
 import InformationModal from "./kiosk/popups/Information";
-
+import {useFetchSVGRects} from "../customHook/useFetchSVGRects";
 const ChartContainer = ({ target }) => {
+  // use the custom hook to fetch the node on the svg file
+  const rects = useFetchSVGRects('/maps/ground_floor.svg')
+
+  console.log(rects)
+
   console.log(target.id)
   const [modalData, setModalData] = useState(null); // State to manage modal data
   const [isModalOpen, setIsModalOpen] = useState(false); // State to manage modal visibility
@@ -29,6 +34,8 @@ const ChartContainer = ({ target }) => {
         console.error("SVG not loaded yet.");
         return;
       }
+
+      
 
       const { shortestPath } = calculateShortestPathWithEdges(svgElement, target.id);
       console.log(shortestPath)
