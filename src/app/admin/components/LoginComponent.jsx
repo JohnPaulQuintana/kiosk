@@ -4,7 +4,7 @@ const LoginComponent = () => {
     const [formData, setFormData] = useState({ email: "", password: "" });
     const [loading, setLoading] = useState(false); // Loader state
     const [error, setError] = useState(null); // Error state for validation
-    const [success, setSuccess] = useState(null); // Success message
+    const [success, setSuccess] = useState([]); // Success message
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -14,7 +14,7 @@ const LoginComponent = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError(null);
-        setSuccess(null);
+        setSuccess([]);
 
         // Basic client-side validation
         if (!formData.email || !formData.password) {
@@ -35,7 +35,7 @@ const LoginComponent = () => {
             const data = await response.json();
 
             if (response.ok) {
-                setSuccess("Login successful!");
+                setSuccess(data);
                 console.log("Token:", data.token); // Handle token storage if needed
             } else {
                 setError(data.message || "Login failed. Please try again.");
@@ -44,17 +44,31 @@ const LoginComponent = () => {
             setError("An error occurred. Please try again later.");
         } finally {
             setLoading(false); // Hide loader
+            setTimeout(() => {
+                setSuccess([])
+            }, 3000);
         }
     };
 
     return (
 
         <div className="w-full">
+            {success?.token && (
+                <div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex items-center justify-center z-50">
+                <div className="bg-white p-5 rounded-lg shadow-lg flex flex-col items-center">
+                    <div className="loader border-t-4 border-green-500 border-solid w-12 h-14 rounded-full animate-spin"></div>
+                    <p className="ml-4 text-green-700 text-xl">{success.data.name}</p>
+                    <p className="ml-4 text-green-700">{success.message}</p>
+                    <p className="ml-4 text-green-700">Redirecting to dashboard...</p>
+                    
+                </div>
+            </div>
+            )}
             {/* Modal Loader */}
             {loading && (
                 <div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex items-center justify-center z-50">
                     <div className="bg-white p-5 rounded-lg shadow-lg flex flex-col items-center">
-                        <div className="loader border-t-4 border-red-500 border-solid w-12 h-12 rounded-full animate-spin"></div>
+                        <div className="loader border-t-4 border-red-500 border-solid w-12 h-14 rounded-full animate-spin"></div>
                         <p className="ml-4 text-red-700">Authenticating...</p>
                     </div>
                 </div>
@@ -106,7 +120,7 @@ const LoginComponent = () => {
                     {error && <p className="text-center text-red-500">{error}</p>}
 
                     {/* Success Message */}
-                    {success && <p className="text-center text-green-500">{success}</p>}
+                    {/* {success && <p className="text-center text-green-500">{success}</p>} */}
 
                     <div className="bg-red-500 text-white rounded-sm hover:bg-red-700">
                         <button type="submit" className="border w-full p-2" disabled={loading}>
