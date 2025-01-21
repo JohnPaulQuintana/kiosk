@@ -5,6 +5,7 @@ import './App.css'
 import {BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import Home from './app/kiosk/pages/HomePage';
 import NavigationPage from './app/kiosk/pages/NavigationPage';
+import AdminPage from './app/kiosk/pages/AdminPage';
 function App() {
 
   return (
@@ -14,6 +15,8 @@ function App() {
       <Routes>
           <Route path='/' element={<Home />} />
           <Route path='/navigation' element={<NavigationPage />} />
+          {/* admin side */}
+          <Route path='/admin' element={<AdminPage />} />
       </Routes>
       
     </BrowserRouter>
