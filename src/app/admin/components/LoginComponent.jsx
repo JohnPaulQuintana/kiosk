@@ -58,8 +58,8 @@ const LoginComponent = () => {
                 <div className="bg-white p-5 rounded-lg shadow-lg flex flex-col items-center">
                     <div className="loader border-t-4 border-green-500 border-solid w-12 h-14 rounded-full animate-spin"></div>
                     <p className="ml-4 text-green-700 text-xl">{success.data.name}</p>
-                    <p className="ml-4 text-green-700">{success.message}</p>
-                    <p className="ml-4 text-green-700">Redirecting to dashboard...</p>
+                    <p className="ml-4 text-slate-700">{success.message}</p>
+                    <p className="ml-4 text-slate-700">Redirecting to dashboard...</p>
                     
                 </div>
             </div>
