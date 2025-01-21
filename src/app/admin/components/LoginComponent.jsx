@@ -52,7 +52,7 @@ const LoginComponent = () => {
 
     return (
 
-        <div className="w-full">
+        <div className="w-full flex items-center justify-center h-screen">
             {success?.token && (
                 <div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex items-center justify-center z-50">
                 <div className="bg-white p-5 rounded-lg shadow-lg flex flex-col items-center">

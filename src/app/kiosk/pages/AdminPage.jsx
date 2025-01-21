@@ -3,7 +3,7 @@ import LoginComponent from "../../admin/components/LoginComponent";
 
 const AdminPage = () => {
     return (
-        <div className="flex items-center justify-center h-screen">
+        <div className="">
             {/* Login Components */}
             <LoginComponent />
         </div>
