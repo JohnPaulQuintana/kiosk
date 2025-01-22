@@ -54,9 +54,9 @@ z-index: 9999999 !important; /* You can adjust this value as needed */
   transform-origin: center; /* Ensures the zoom happens from the center */
   transition: visibility 0.3s ease, opacity 0.3s ease;
 }
-.hidden {
+/* .hidden {
   display: none;
-}
+} */
 
 
 #image-viewer div {
