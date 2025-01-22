@@ -12,7 +12,7 @@ export const calculateShortestPathWithEdges = (svgElement2, target) => {
     if (pathGroup) {
         const rects = pathGroup.querySelectorAll("rect"); // Get all rectangles.
         rects.forEach((rect) => {
-            if(rect.id === "ground_guidance_counseling_door1") console.log(rect);
+            // if(rect.id === "ground_guidance_counseling_door1") console.log(rect);
             const id = rect.id || "No ID";  // Default to "No ID" if no ID is found.
             const x = parseFloat(rect.getAttribute("x")) || 0;  // Get the x-coordinate.
             const y = parseFloat(rect.getAttribute("y")) || 0;  // Get the y-coordinate.

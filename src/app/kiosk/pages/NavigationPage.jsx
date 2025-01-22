@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import SVGLoader from "../components/SVGLoader";
 import ChartContainer from "../components/ChartContainer";
 import HeaderSection from "../components/kiosk/HeaderSection";
-import facilities from "../data/facilities";
+// import facilities from "../data/facilities";
 
 const NavigationPage = () => {
     const [activeNav, setActiveNav] = useState("facilities");
