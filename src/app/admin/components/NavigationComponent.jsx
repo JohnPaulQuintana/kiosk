@@ -14,6 +14,15 @@ const DashboardLayout = () => {
   const [loadingGroups, setLoadingGroups] = useState(false); // State for loading
   const [facilities, setFacilities] = useState([]);
   const [uploadedFile, setUploadedFile] = useState([])
+
+  // Pagination States
+  const [currentFloor, setCurrentFloor] = useState('FLOOR OPTION');
+  const [floorplans, setFloorplans] = useState([]);
+  const [filteredFloorplans, setFilteredFloorplans] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [isFetching, setIsFetching] = useState(false);
+
   // Fetch groups using the custom hook, and always call it
   const fetchedGroups = useFetchSvgGroups(filePath); // Now the hook is always called unconditionally
 
@@ -31,30 +40,33 @@ const DashboardLayout = () => {
         setLoadingGroups(true);
         axios.post(
           `${baseApiUrl}/floorplan/units`,
-          { facilities, uploadedFile },
+          { "floor": facilities[0].floor, facilities, uploadedFile },
           {
             headers: {
               Authorization: "Bearer " + localStorage.getItem("authToken") || 0,
             },
           }
         )
-        .then((response) => {
-          console.log('Server Response:', response.data);
-          Swal.fire("Success", "Facilities information sent to the server successfully!", "success");
-        })
-        .catch((error) => {
-          console.error("Error sending groups:", error);
-          Swal.fire("Failed", "Failed to process the SVG information to the server.", "error");
-        })
-        .finally(() => {
-          setLoadingGroups(false);
-        });
+          .then((response) => {
+            console.log('Server Response:', response.data);
+            Swal.fire("Success", "Facilities information sent to the server successfully!", "success");
+
+            // fecth the units and current floor
+            fetchFloorplans(currentPage);
+          })
+          .catch((error) => {
+            console.error("Error sending groups:", error);
+            Swal.fire("Failed", "Failed to process the SVG information to the server.", "error");
+          })
+          .finally(() => {
+            setLoadingGroups(false);
+          });
       } catch (error) {
         console.error("Error sending facilities:", error);
         setLoadingGroups(false);
       }
     }
-  }, [facilities]); // This will trigger when `facilities` state is updated
+  }, [facilities, currentPage]); // This will trigger when `facilities` state is updated
 
   const handleFileChange = (e) => {
     setFile(e.target.files[0]); // Update the file state when a file is selected
@@ -99,20 +111,52 @@ const DashboardLayout = () => {
     }
   };
 
+  const fetchFloorplans = async (page = 1) => {
+    setIsFetching(true);
+    try {
+      const response = await axios.get(`${baseApiUrl}/floorplan/unit/collections`, {
+        params: { page, currentFloor },
+        headers: { Authorization: "Bearer " + localStorage.getItem("authToken") || 0 },
+      });
+
+      setFloorplans(response.data.data);
+      setCurrentPage(response.data.current_page);
+      setTotalPages(response.data.last_page);
+    } catch (error) {
+      console.error("Error fetching floorplans:", error);
+      Swal.fire("Failed", "Failed to fetch floorplans.", "error");
+    } finally {
+      setIsFetching(false);
+    }
+  };
+
+  // Handle floor selection filter
+  const handleFloorChange = (e) => {
+    const selectedFloor = e.target.value;
+    setCurrentFloor(selectedFloor);
+
+    // Filter floorplans by the selected floor
+    const filtered = floorplans.filter(plan => plan.floor === selectedFloor);
+    setFilteredFloorplans(filtered);
+  };
+
+  //load on load
+  useEffect(() => {
+    // fecth the units and current floor
+    fetchFloorplans(currentPage);
+  }, [currentPage])
+
   return (
     <div className="flex">
-      {/* Main Content */}
-      <div className="flex-1 bg-gray-100 p-4 h-screen">
+      <div className="flex-1 bg-gray-100 p-4 h-[90vh] w-full overflow-hidden">
         <h1 className="text-2xl font-bold">Campus Navigation Kiosk Dashboard</h1>
         <p>Welcome to Floor Information Level!</p>
 
-        <div className="mt-2 py-2">
-          <div className="mt-4 py-2">
+        <div className="py-2">
+          <div className="py-2">
             <div className="flex justify-between items-center mb-2">
-              <h1 className="text-xl font-semibold text-green-500">
-                Available FloorPlan Layout
-              </h1>
-              {/* Button to open the modal */}
+              <h1 className="text-xl font-semibold text-green-500">Available FloorPlan Layout</h1>
+
               <button
                 type="button"
                 onClick={() => setShowModal(true)}
@@ -121,8 +165,89 @@ const DashboardLayout = () => {
                 Upload Floorplan
               </button>
             </div>
-            <div className="w-full border py-2 p-2">
-              <span>Table content here</span>
+
+            {/* Floor filter dropdown */}
+            <div className="mb-4">
+              <label htmlFor="floorFilter" className="block text-gray-700">Filter by Floor:</label>
+              <select
+                id="floorFilter"
+                onChange={handleFloorChange}
+                value={currentFloor}
+                className="mt-2 p-2 border border-gray-300 rounded-md"
+              >
+                {/* Dynamically generate options for 12 floors */}
+                {[
+                  'FLOOR OPTION', 'GROUND FLOOR', 'FIRST FLOOR', 'SECOND FLOOR', 'THIRD FLOOR', 'FOURTH FLOOR',
+                  'FIFTH FLOOR', 'SIXTH FLOOR', 'SEVENTH FLOOR', 'EIGHTH FLOOR', 'NINTH FLOOR',
+                  'TENTH FLOOR', 'ELEVENTH FLOOR'
+                ].map((floor) => (
+                  <option key={floor} value={floor}>{floor}</option>
+                ))}
+              </select>
+            </div>
+
+            <div className="w-full border bg-white py-2 p-2">
+              {isFetching ? (
+                <div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex items-center justify-center z-50">
+                  <div className="bg-white p-5 rounded-lg shadow-lg flex flex-col items-center">
+                    <div className="loader border-t-4 border-green-500 border-solid w-12 h-14 rounded-full animate-spin"></div>
+                    <p className="ml-4 text-green-500 text-2xl">In Progress...</p>
+                    <p className="ml-4 text-slate-700">Collecting all the units for the current floor...</p>
+                  </div>
+                </div>
+              ) : (
+                <div className="w-full h-[50vh] overflow-y-auto">
+                  <table className="w-full table-auto border-collapse border-0 border-gray-200">
+                    <thead>
+                      <tr className="bg-green-500 text-white">
+                        <th className="p-2 text-left">ID</th>
+                        <th className="p-2 text-left">Unit</th>
+                        <th className="p-2 text-left">Availability</th>
+                        <th className="p-2 text-left">Old Unit</th>
+                        <th className="p-2 text-left">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody className="">
+                      {filteredFloorplans.length > 0 ? (
+                        filteredFloorplans.map((plan, index) => (
+                          plan.units.map((unit, unitIndex) => (
+                            <tr key={`${index}-${unitIndex}`} className="text-left border-b-2 hover:bg-gray-100">
+                              <td className="p-2">{unit.id}</td>
+                              <td className="p-2">{unit.unit}</td>
+                              <td className="p-2"><span className={`text-xs text-white ${unit.availability ? 'bg-green-500' : 'bg-red-500'} rounded-md px-2`}>{unit.availability ? "True" : "False"}</span></td>
+                              <td className="p-2">{unit.old_unit}</td>
+                              <td className="p-2">
+                                <button className="text-blue-500 hover:underline">Update</button>
+                              </td>
+                            </tr>
+                          ))
+                        ))
+                      ) : (
+                        <tr>
+                          <td colSpan="5" className="border p-2 text-center">No data found for selected floor.</td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                  <div className="mt-4 flex justify-center space-x-2">
+                    <button
+                      disabled={currentPage === 1}
+                      onClick={() => setCurrentPage(currentPage - 1)}
+                      className="px-4 py-2 bg-gray-200 hover:bg-gray-300 disabled:bg-gray-100"
+                    >
+                      Previous
+                    </button>
+                    <button
+                      disabled={currentPage === totalPages}
+                      onClick={() => setCurrentPage(currentPage + 1)}
+                      className="px-4 py-2 bg-gray-200 hover:bg-gray-300 disabled:bg-gray-100"
+                    >
+                      Next
+                    </button>
+                  </div>
+                </div>
+
+              )}
             </div>
           </div>
         </div>
