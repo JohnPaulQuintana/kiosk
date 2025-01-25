@@ -70,11 +70,11 @@ const ChartContainer = ({ target, file }) => {
 
       const dom = document.getElementById("chart-container");
       // Prevent default touch behavior
-      chartRef.current.addEventListener(
-        'touchstart',
-          (e) => e.preventDefault(),
-          { passive: false }
-      );
+      // chartRef.current.addEventListener(
+      //   'touchstart',
+      //     (e) => e.preventDefault(),
+      //     { passive: false }
+      // );
 
       myChart = echarts.init(dom, "", { renderer: "svg" });
 
