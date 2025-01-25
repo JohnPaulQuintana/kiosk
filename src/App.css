@@ -58,6 +58,9 @@ z-index: 9999999 !important; /* You can adjust this value as needed */
   display: none;
 } */
 
+.chart-container {
+  touch-action: none; /* Disable pinch-to-zoom and browser gestures */
+}
 
 #image-viewer div {
   position: fixed;
