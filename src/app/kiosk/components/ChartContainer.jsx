@@ -91,6 +91,10 @@ const ChartContainer = ({ target, file }) => {
             roam: true,
             center: routeCoords[routeCoords.length - 1],
             zoom: 4,
+            scaleLimit: {
+                min: 1,
+                max: 10, // Control zooming limits
+            },
             emphasis: { itemStyle: { color: undefined }, label: { show: true } },
           },
           series: [
