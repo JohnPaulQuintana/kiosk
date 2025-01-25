@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useRef } from "react";
 import * as echarts from "echarts";
 import $ from "jquery";
 import { calculateShortestPathWithEdges } from "../customHook/pathCalculation";
@@ -31,7 +31,7 @@ const ChartContainer = ({ target, file }) => {
   }, []);
 
   const chartRef = useRef(null);
-  
+
   useEffect(() => {
     let myChart; // Declare chart instance to use in cleanup
 
