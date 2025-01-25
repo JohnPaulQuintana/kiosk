@@ -30,6 +30,8 @@ const ChartContainer = ({ target, file }) => {
     setSvgLoaded(true);
   }, []);
 
+  const chartRef = useRef(null);
+  
   useEffect(() => {
     let myChart; // Declare chart instance to use in cleanup
 
@@ -67,6 +69,13 @@ const ChartContainer = ({ target, file }) => {
       }
 
       const dom = document.getElementById("chart-container");
+      // Prevent default touch behavior
+      chartRef.current.addEventListener(
+        'touchstart',
+          (e) => e.preventDefault(),
+          { passive: false }
+      );
+
       myChart = echarts.init(dom, "", { renderer: "svg" });
 
       // const ROOT_PATH = "maps/";
@@ -235,6 +244,12 @@ const ChartContainer = ({ target, file }) => {
 
     // Initialize chart only after SVG is loaded and target changes
     if (svgLoaded) initializeChart();
+
+    // Debug touch event detection
+    myChart.getZr().on('touchstart', (event) => {
+        console.log('Touch event detected by ECharts:', event);
+    });
+
     return () => {
       // Cleanup chart instance to avoid memory leaks
       if (myChart) myChart.dispose();
@@ -249,8 +264,9 @@ const ChartContainer = ({ target, file }) => {
       {/* Only render chart container once SVG is loaded */}
       {svgLoaded && (
         <div
+          ref={chartRef}
           id="chart-container"
-          className="w-full h-screen border bg-slate-600 rounded-md p-2 shadow mt-16"
+          className="w-full h-screen border bg-slate-600 rounded-md p-2 shadow mt-16 pointer-events-auto touch-none"
         // style={{ width: "100%", height: "100vh", border: "1px solid #ccc" }}
         />
       )}
