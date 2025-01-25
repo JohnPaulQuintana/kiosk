@@ -246,9 +246,9 @@ const ChartContainer = ({ target, file }) => {
     if (svgLoaded) initializeChart();
 
     // Debug touch event detection
-    myChart.getZr().on('touchstart', (event) => {
-        console.log('Touch event detected by ECharts:', event);
-    });
+    // myChart.getZr().on('touchstart', (event) => {
+    //     console.log('Touch event detected by ECharts:', event);
+    // });
 
     return () => {
       // Cleanup chart instance to avoid memory leaks
