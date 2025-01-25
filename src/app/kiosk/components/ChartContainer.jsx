@@ -76,7 +76,7 @@ const ChartContainer = ({ target, file }) => {
       //     { passive: false }
       // );
 
-      myChart = echarts.init(dom, "", { renderer: "svg" });
+      myChart = echarts.init(dom, "", { renderer: "canvas" });
 
       // const ROOT_PATH = "maps/";
       $.get(`${baseApiFile}${svgfile}`, (svg) => {
