@@ -5,11 +5,24 @@ import { calculateShortestPathWithEdges } from "../customHook/pathCalculation";
 import SVGLoader from "../components/SVGLoader"; // Import the SVGLoader
 import InformationModal from "./kiosk/popups/Information";
 import { useFetchSVGRects } from "../customHook/useFetchSVGRects";
-const ChartContainer = ({ target, file }) => {
+import InterractSvgMap from "./InterractSvgMap";
+import InterractModal from "./kiosk/popups/InterractModal";
+const ChartContainer = ({ target, file, data, renderMap }) => {
+
+  console.log(renderMap)
+  const [isOpen, setIsOpen] = useState(false);
+  const [infos, setInfos] = useState(null)
+  const handleModalInterractOpen = (data) => {
+    setInfos(data)
+    setIsOpen(true)
+  };
+  const handleModalInterractClose = () => setIsOpen(false);
+
   // use the custom hook to fetch the node on the svg file
   const rects = useFetchSVGRects('/maps/ground_floor.svg')
   const baseApiFile = "http://127.0.0.1:8001/api";
   const svgfile = localStorage.getItem('filename')
+  const currentFloor = localStorage.getItem('floor')
   // console.log(rects)
 
   //save the target unit for second floor
@@ -23,7 +36,8 @@ const ChartContainer = ({ target, file }) => {
   const [isModalOpen, setIsModalOpen] = useState(false); // State to manage modal visibility
 
   // console.log(target)
-  const [svgLoaded, setSvgLoaded] = useState(false); // State to track SVG loading
+  const [svgLoaded, setSvgLoaded] = useState(true); // State to track SVG loading
+  const [showInterractMap, setShowInterractMap] = useState(false);
 
   // Prevent multiple calls to handleSVGLoad
   const handleSVGLoad = useCallback(() => {
@@ -31,9 +45,9 @@ const ChartContainer = ({ target, file }) => {
   }, []);
 
   const chartRef = useRef(null);
-
+  let myChart; // Declare chart instance to use in cleanup
   useEffect(() => {
-    let myChart; // Declare chart instance to use in cleanup
+
 
     const initializeChart = async () => {
       // const svgElement = document.querySelector("#svgContainer svg");
@@ -54,7 +68,7 @@ const ChartContainer = ({ target, file }) => {
 
       const svgElement = await waitForSvgLoad();
       console.log("SVG Element Loaded:", svgElement);
-      
+
 
       if (!svgElement) {
         console.error("SVG not loaded yet.");
@@ -76,7 +90,7 @@ const ChartContainer = ({ target, file }) => {
       //     { passive: false }
       // );
 
-      myChart = echarts.init(dom, "", { renderer: "canvas" });
+      myChart = echarts.init(dom, "", { renderer: "svg" });
 
       // const ROOT_PATH = "maps/";
       $.get(`${baseApiFile}${svgfile}`, (svg) => {
@@ -90,7 +104,7 @@ const ChartContainer = ({ target, file }) => {
         // console.log("Route Coordinates:", routeCoords);
 
         // Create series dynamically from blockedPaths
-        
+
 
         const option = {
           title: { text: "Floorplan Layout", left: "center", bottom: 10 },
@@ -99,11 +113,12 @@ const ChartContainer = ({ target, file }) => {
             map: "CustomMap",
             roam: true,
             center: routeCoords[routeCoords.length - 1],
-            zoom: 4,
+            zoom: 10,
             scaleLimit: {
-                min: 1,
-                max: 10, // Control zooming limits
+              min: 1,
+              max: 10, // Control zooming limits
             },
+            selectedMode: 'single', // ✅ Enables individual element selection
             emphasis: { itemStyle: { color: undefined }, label: { show: true } },
           },
           series: [
@@ -128,43 +143,6 @@ const ChartContainer = ({ target, file }) => {
               },
               data: [{ coords: routeCoords }],
             },
-          // ...seriesData,
-            // {
-            //   name: target,
-            //   type: "scatter", // Use scatter for markers
-            //   coordinateSystem: "geo", // Specifies that the map uses geographic coordinates (latitude, longitude)
-            //   symbol: "rect", // Pin is used as the marker symbol
-            //   // symbolSize: 20, // Size of the pin symbol
-            //   itemStyle: {
-            //     color: "#0D832C", // Green color for the target pin
-            //     borderColor: "#fff", // White border around the pin
-            //     borderWidth: 2, // Width of the border
-            //     opacity: 0.8, // Transparency of the marker
-            //   },
-            //   label: {
-            //     show: false, // Display a label
-            //     position: "top", // Position of the label relative to the pin
-            //     formatter: `{b}`, // Display the name of the target
-            //     fontSize: 12, // Font size for the label
-            //     color: "#fff", // Color of the label text
-            //     fontWeight: "bold", // Bold font weight on hover
-            //     padding: [5, 10, 5, 10], // Padding around the label
-            //     backgroundColor: "rgba(0, 0, 0, 0.7)", // Background color of the label with transparency
-            //     borderRadius: 5, // Rounded corners of the label background
-            //   },
-            //   data: [
-            //     {
-            //       // coord: routeCoords[5],  // Target the coordinate at index 5
-            //       name: "BlockPath", // Name of the target point
-            //       value: blockedPaths, // The coordinates [longitude, latitude] of the target destination
-            //     },
-            //   ],
-            //   symbolSize: [25, 15],  // Adjust size to fully cover the effect at index 5
-            //   itemStyle: {
-            //     color: "inherit",  // White or any color to "mask" the effect
-            //     opacity: 1,
-            //   },
-            // },
             {
               name: target.door,
               type: "scatter", // Use scatter for markers
@@ -226,6 +204,26 @@ const ChartContainer = ({ target, file }) => {
 
         myChart.setOption(option);
 
+        // ✅ Add Click Event Listener for SVG elements
+        myChart.on('click', function (params) {
+          console.log("Clicked Element:", params);
+
+          if (params.componentType === 'geo') {
+            const clickedElement = params.name || "Unknown Element";
+
+            // Highlight the clicked element (Optional)
+            myChart.dispatchAction({
+              type: 'highlight',
+              geoIndex: 0, // Index of the geo component
+              name: clickedElement, // Element name
+            });
+
+            // Example: Open Modal
+            setModalData({ name: clickedElement });
+            setIsModalOpen(true);
+          }
+        });
+
         // Event listener for user click on marker
         myChart.on('click', function (params) {
           if (params.componentType === 'series' && params.seriesName === target.door) {
@@ -256,19 +254,37 @@ const ChartContainer = ({ target, file }) => {
     };
   }, [svgLoaded, target, svgfile]); // Include `target` as a dependency
 
+  // handle click event for enable interract
+
+  const enableInterract = () => {
+    console.log(localStorage.getItem('floor'))
+    setShowInterractMap(true);
+    setSvgLoaded(false)
+    // window.location.reload(true)
+    // Cleanup chart instance to avoid memory leaks
+    // if (myChart) myChart.dispose();
+  }
   return (
     <div>
       {/* SVGLoader component */}
       <SVGLoader filePath={`${svgfile}`} onLoad={handleSVGLoad} />
 
       {/* Only render chart container once SVG is loaded */}
-      {svgLoaded && (
-        <div
-          ref={chartRef}
-          id="chart-container"
-          className="w-full h-screen border bg-slate-600 rounded-md p-2 shadow mt-16 pointer-events-auto touch-none"
-        // style={{ width: "100%", height: "100vh", border: "1px solid #ccc" }}
-        />
+      {showInterractMap  ? (
+        
+        <InterractSvgMap key="map" onOpen={handleModalInterractOpen} currentFloor={currentFloor} floorplans={data} />
+      ) : (
+        // <InterractSvgMap currentFloor={currentFloor} floorplans={defaultFloorplans} />
+        <div className="relative" key="chart">
+          <div
+            ref={chartRef}
+            id="chart-container"
+            className="w-full h-screen border bg-slate-600 rounded-md p-2 shadow mt-16 pointer-events-auto touch-none">
+          </div>
+          <div className="absolute bottom-20 right-10 opacity-80 animate-infiniteScale">
+            <button onClick={() => enableInterract()} type="button" className="bg-green-500 p-1 text-xl text-white rounded-md">Enable Interract</button>
+          </div>
+        </div>
       )}
 
       {/* popups */}
@@ -276,6 +292,8 @@ const ChartContainer = ({ target, file }) => {
       {isModalOpen && (
         <InformationModal data={target} onClose={() => setIsModalOpen(false)} />
       )}
+
+      <InterractModal isOpen={isOpen} infos={infos} onClose={handleModalInterractClose} />
     </div>
   );
 };

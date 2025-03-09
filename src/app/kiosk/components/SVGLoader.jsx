@@ -2,18 +2,18 @@ import React, { useEffect } from "react";
 
 const SVGLoader = ({ filePath, onLoad }) => {
   let baseApiUrl = "http://127.0.0.1:8001/api";
-
+  // Check if the filename in localStorage is the same as the new filePath
+  const storedFileName = localStorage.getItem("filename");
   useEffect(() => {
     const loadSVG = async () => {
-      console.log(filePath)
+      // console.log(filePath)
       // Only run the load process if filePath is valid
       if (!filePath) {
         console.log("No file path provided");
         return;
       }
 
-      // Check if the filename in localStorage is the same as the new filePath
-      const storedFileName = localStorage.getItem("filename");
+      
       const currentFilePath = filePath;
       
       // if (storedFileName === currentFilePath) {
@@ -21,7 +21,7 @@ const SVGLoader = ({ filePath, onLoad }) => {
       //   return; // If the SVG is already loaded, skip fetching it again
       // }
 
-      console.log(currentFilePath);
+      // console.log(currentFilePath);
       localStorage.setItem("filename", currentFilePath);
 
       // Fetch the new SVG

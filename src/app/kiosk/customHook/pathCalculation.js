@@ -1,10 +1,10 @@
 // Main function to calculate the shortest path with edges.
 export const calculateShortestPathWithEdges = (svgElement2, target) => {
-    console.log(target);
+    // console.log(target);
     
     // Split the target string to determine the floor (indicator)
     let indicator = target.split('_'); // Split by underscore and take the first part
-    console.log(indicator)
+    // console.log(indicator)
     // Step 2: Check each word if it contains a hyphen, then split by hyphen
     let result = [];
     indicator.forEach(word => {
@@ -17,7 +17,7 @@ export const calculateShortestPathWithEdges = (svgElement2, target) => {
             result.push(word);
         }
     });
-    console.log(result)
+    // console.log(result)
     let process = 0
     let pathGroupSelector = []
 
@@ -42,7 +42,7 @@ export const calculateShortestPathWithEdges = (svgElement2, target) => {
             break;
     }
 
-    console.log(pathGroupSelector[0][1])
+    // console.log(pathGroupSelector[0][1])
 
     // Select the SVG container element
     const svgElement = document.querySelector("#svgContainer svg");
@@ -57,15 +57,15 @@ export const calculateShortestPathWithEdges = (svgElement2, target) => {
         
         // Select the path group corresponding to the current floor/level
         let pathGroup = svgElement.querySelector(`[id="${pathGroupSelector[0][index-1]}"]`);
-        console.log(`${pathGroupSelector[0][index-1]}`)
-        console.log(pathGroup)
+        // console.log(`${pathGroupSelector[0][index-1]}`)
+        // console.log(pathGroup)
         
         // Select the kiosk (starting point) for this level
         let kiosk = svgElement.querySelector(`${index > 1 ? "#ground_"+result[1]+"_stairs_a_door1" : "#kiosk"}`);
         if(!kiosk){
             kiosk = svgElement.querySelector(`${index > 1 ? "#ground_stairs_"+result[1]+"_a_door1" : "#kiosk"}`);
         }
-        console.log(kiosk)
+        // console.log(kiosk)
 
         // Process the path group (all rectangles within the path).
         if (pathGroup) {
@@ -85,29 +85,34 @@ export const calculateShortestPathWithEdges = (svgElement2, target) => {
             let y = parseFloat(kiosk.getAttribute("y")) || 0;  // Get the y-coordinate.
             nodes.push({ id, x, y });  // Add the kiosk node to the nodes array.
         }
-        console.log(nodes);
+        // console.log(nodes);
 
         // Find the start node (kiosk) and end node (a specific rectangle).
         let startNode = nodes.find((node) => node.id === `${index > 1 ? "ground_"+result[1]+"_stairs_a_door1" : "kiosk"}`);
         if(!startNode){
             startNode = nodes.find((node) => node.id === `${index > 1 ? "ground_stairs_"+result[1]+"_a_door1" : "kiosk"}`);
         }
-        console.log(startNode);
+        // console.log(startNode);
         let endNode = nodes.find((node) => node.id.trim().toLowerCase() === target.trim().toLowerCase());
         if (!endNode) {
             // Fallback if the end node wasn't found by its exact target ID
-            console.log('yes')
+            // console.log('yes')
             endNode = nodes.find((node) => node.id.trim().toLowerCase() === `ground_${result[1]}_stairs_a_door1`)
             if(!endNode){
                 endNode = nodes.find((node) => node.id.trim().toLowerCase() === `ground_stairs_${result[1]}_a_door1`)
             }
         }
-        console.log(endNode, target);
+        // console.log(endNode, target);
 
         // If the start or end node isn't found, log an error and return an empty path.
         if (!startNode || !endNode) {
             console.error("Start or End node not found.");
-            return { shortestPath: [], totalDistance: 0 };
+            return { shortestPath: [{
+                "id": "kiosk",
+                "x": 1998,
+                "y": 3789,
+                "distance": 198.23828291342596
+            }], totalDistance: 0 };
         }
 
         // Calculate an adaptive threshold based on the distance between nodes
@@ -230,7 +235,7 @@ const calculateShortestPath = (nodes, startNode, endNode, threshold) => {
         traceNodeId = previous[traceNodeId];  // Move to the previous node.
     }
 
-    console.log(coords)
+    // console.log(coords)
 
     // Find the index of the first object where id starts with "ab2_zone"
     // const zIndex = coords.findIndex((obj) => obj.id.startsWith("ab2_zone"));

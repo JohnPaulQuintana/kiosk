@@ -16,11 +16,17 @@ export default {
       keyframes: {
         scale: {
           '0%, 100%': { transform: 'scale(1)' }, // Start and end at scale 1
-          '50%': { transform: 'scale(1.1)' },    // Scale up slightly at 50%
+          '50%': { transform: 'scale(1.1)', 'opacity':1 },    // Scale up slightly at 50%
+        },
+        blink: {
+          '0%': { "fill":'#28a745' },
+          '50%': { "fill":'#1e7e34' },
+          '100%': { "fill":'#28a745' },
         },
       },
       animation: {
         infiniteScale: 'scale 2s ease-in-out infinite', // Name, duration, and infinite repeat
+        blink: 'blink 3s infinite', // Adjust timing for faster/slower blink
       },
     },
   },

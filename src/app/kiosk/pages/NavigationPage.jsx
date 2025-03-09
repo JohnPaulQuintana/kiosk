@@ -4,9 +4,20 @@ import ChartContainer from "../components/ChartContainer";
 import HeaderSection from "../components/kiosk/HeaderSection";
 import Swal from "sweetalert2";
 import axios from "axios";
+import InterractSvgMap from "../components/InterractSvgMap";
+import InterractModal from "../components/kiosk/popups/InterractModal";
 // import facilities from "../data/facilities";
 
 const NavigationPage = () => {
+    const [isOpen, setIsOpen] = useState(false);
+    const [renderMap, setRenderMap] = useState(false);
+    const [infos, setInfos] = useState(null)
+    const handleModalInterractOpen = (data) => {
+        setInfos(data)
+        setIsOpen(true)
+    };
+    const handleModalInterractClose = () => setIsOpen(false);
+    
     const [activeNav, setActiveNav] = useState("GROUND FLOOR");
     // const [selectedItem, setSelectedItem] = useState("kiosk");
     const [selectedItem, setSelectedItem] = useState({
@@ -24,6 +35,7 @@ const NavigationPage = () => {
     // Pagination States
     const [currentFloor, setCurrentFloor] = useState('GROUND FLOOR');
     const [floorplans, setFloorplans] = useState([]);
+    const [defaultFloorplans, setDefaultFloorplans] = useState([]);
     const [filteredFloorplans, setFilteredFloorplans] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
@@ -41,6 +53,9 @@ const NavigationPage = () => {
 
             setFloorplans(response.data.data);
             console.log(response.data.data)
+            localStorage.setItem('floorplans',JSON.stringify(response.data.data))
+            localStorage.setItem('floor', response.data.data[0].floor)
+            setDefaultFloorplans(response.data.data)
             setCurrentPage(response.data.current_page);
             setTotalPages(response.data.last_page);
         } catch (error) {
@@ -48,7 +63,7 @@ const NavigationPage = () => {
             Swal.fire("Failed", "Failed to fetch floorplans.", "error");
         } finally {
             setIsFetching(false);
-            handleFloorChange('GROUND FLOOR')
+            // handleFloorChange('GROUND FLOOR')
         }
     };
 
@@ -71,28 +86,37 @@ const NavigationPage = () => {
     const handleUserClicked = useCallback((target, files) => {
         setSelectedItem(target);
         setFile(localStorage.getItem('filename'))
+        setRenderMap(true)
     }, []);
 
-    // Handle floor selection filter
-    const handleFloorChange = (floor) => {
-        // const selectedFloor = floor;
-        console.log(floor)
-        setCurrentFloor(floor);
-        setActiveNav(floor)
-        // Filter floorplans by the selected floor
-        const filtered = floorplans.filter(plan => plan.floor === floor);
-        console.log(filtered)
-        // change the local storage floor
-        localStorage.setItem('filename', filtered[0].filepath)
-        setFilteredFloorplans(filtered);
-    };
-
-    //load on load
     useEffect(() => {
-        // fecth the units and current floor
-        fetchFloorplans(currentPage);
-        setFile(localStorage.getItem('filename'))
-    }, [currentPage])
+        // Default to the Ground Floor when the component mounts
+        const defaultFloor = "GROUND FLOOR";
+        setCurrentFloor(defaultFloor);  // Set initial floor state
+        setActiveNav(defaultFloor);     // Set the active navigation tab
+        // Fetch floor plans for the default floor (Ground Floor) immediately
+        fetchFloorplans();  // Using default values for currentFloor and currentPage
+        
+    }, []);  // Empty dependency array ensures it runs once when the component mounts
+    
+    const handleFloorChange = (floor) => {
+        const defaultFloor = "GROUND FLOOR";  // Ensure default is set to "Ground Floor"
+        
+        // Set the floor and active nav dynamically based on user selection
+        setCurrentFloor(floor ? floor : defaultFloor);
+        setActiveNav(floor ? floor : defaultFloor);
+        
+        // Filter floorplans for the selected floor
+        const filtered = floorplans.filter(plan => plan.floor === (floor || defaultFloor));
+        setFilteredFloorplans(filtered);
+    
+        // Set the file for the selected floor (use the first file or a default one)
+        if (filtered.length > 0) {
+            localStorage.setItem('filename', filtered[0].filepath);
+            localStorage.setItem('floor', filtered[0].floor)
+            setFile(filtered[0].filepath);  // Update the file state for the SVG loader
+        }
+    };
 
     return (
         <div className="w-full h-screen relative">
@@ -331,9 +355,16 @@ const NavigationPage = () => {
                     </button>
 
 
-                    {svgLoaded && <ChartContainer target={selectedItem} file={file} />}
+                    {svgLoaded ? (
+                        <ChartContainer target={selectedItem} file={file} data={defaultFloorplans} renderMap={renderMap}/>
+                        ) : (
+                        <InterractSvgMap onOpen={handleModalInterractOpen} currentFloor={currentFloor} floorplans={defaultFloorplans} />
+                        // <div className="h-screen w-full flex items-center justify-center border">Loading SVG...{defaultFloorplans.floor}</div> // Or any default component or message you want
+                        )}
                 </div>
             </div>
+
+            <InterractModal isOpen={isOpen} infos={infos} onClose={handleModalInterractClose}/>
         </div>
     );
 };
