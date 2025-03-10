@@ -43,7 +43,7 @@ const LoginComponent = () => {
 
         // Redirect to the admin dashboard
         setTimeout(() => {
-          navigate("/dashboard");
+          navigate("/dashboard/home");
         }, 3000); // Optional delay for showing success message
       } else {
         setError(data.message || "Login failed. Please try again.");

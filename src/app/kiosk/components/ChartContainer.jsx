@@ -9,7 +9,7 @@ import InterractSvgMap from "./InterractSvgMap";
 import InterractModal from "./kiosk/popups/InterractModal";
 const ChartContainer = ({ target, file, data, renderMap }) => {
 
-  console.log(renderMap)
+  // console.log(renderMap)
   const [isOpen, setIsOpen] = useState(false);
   const [infos, setInfos] = useState(null)
   const handleModalInterractOpen = (data) => {
@@ -27,9 +27,9 @@ const ChartContainer = ({ target, file, data, renderMap }) => {
 
   //save the target unit for second floor
   localStorage.setItem('target', target.door)
-  console.log(target)
-  console.log(file)
-  console.log(svgfile)
+  // console.log(target)
+  // console.log(file)
+  // console.log(svgfile)
   // console.log(file.filepath)
   // console.log(`${baseApiUrl}${file.filepath}`)
   const [modalData, setModalData] = useState(null); // State to manage modal data
@@ -67,7 +67,7 @@ const ChartContainer = ({ target, file, data, renderMap }) => {
         });
 
       const svgElement = await waitForSvgLoad();
-      console.log("SVG Element Loaded:", svgElement);
+      // console.log("SVG Element Loaded:", svgElement);
 
 
       if (!svgElement) {
@@ -206,7 +206,7 @@ const ChartContainer = ({ target, file, data, renderMap }) => {
 
         // ✅ Add Click Event Listener for SVG elements
         myChart.on('click', function (params) {
-          console.log("Clicked Element:", params);
+          // console.log("Clicked Element:", params);
 
           if (params.componentType === 'geo') {
             const clickedElement = params.name || "Unknown Element";
@@ -227,7 +227,7 @@ const ChartContainer = ({ target, file, data, renderMap }) => {
         // Event listener for user click on marker
         myChart.on('click', function (params) {
           if (params.componentType === 'series' && params.seriesName === target.door) {
-            console.log(params.seriesName)
+            // console.log(params.seriesName)
             // Trigger any other action here, such as updating UI or sending data
             // Set modal data and open modal
             setModalData(target);
@@ -257,7 +257,7 @@ const ChartContainer = ({ target, file, data, renderMap }) => {
   // handle click event for enable interract
 
   const enableInterract = () => {
-    console.log(localStorage.getItem('floor'))
+    // console.log(localStorage.getItem('floor'))
     setShowInterractMap(true);
     setSvgLoaded(false)
     // window.location.reload(true)

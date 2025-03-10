@@ -10,6 +10,8 @@ import AdminPage from './app/admin/pages/AdminPage';
 import NavigationFloorPage from './app/admin/pages/NavigationFloorPage';
 import DashboardLayout from './app/admin/layouts/DashboardLayout';  // Import the DashboardLayout
 import AnnouncementPage from './app/admin/pages/AnnouncementPage';
+import AnalyticPage from './app/admin/pages/AnalyticPage';
+import TeacherSchedule from './app/admin/pages/TeacherSchedule';
 
 function App() {
   const token = localStorage.getItem("authToken"); // Get token from localStorage
@@ -36,6 +38,8 @@ function App() {
           <Route path="home" element={<AdminPage />} />
           <Route path="floor" element={<NavigationFloorPage />} />
           <Route path="announcement" element={<AnnouncementPage />} />
+          <Route path="teachers" element={<TeacherSchedule />} />
+          <Route path="analytics" element={<AnalyticPage />} />
           {/* Add other routes as needed */}
         </Route>
       </Routes>
