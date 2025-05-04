@@ -342,13 +342,15 @@
 import React, { useState } from "react";
 import ChartComponent from "./ChartComponent";
 import InformationModal from "./kiosk/popups/Information";
-
-const ChartContainer = ({ target, file, data, renderMap }) => {
+const apiUrl = import.meta.env.VITE_API_URL;
+const ChartContainer = ({ infos,handleUserClicked, target, file, data, renderMap }) => {
+  const currentFloor = localStorage.getItem('floor')
+  const targetUnit = localStorage.getItem('target')
   const [isOpen, setIsOpen] = useState(false);
-  const [infos, setInfos] = useState(null);
-
+  // const [infos, setInfos] = useState(null);
+  console.log("we need to render:",renderMap, infos)
   const handleModalInterractOpen = (data) => {
-    setInfos(data);
+    // setInfos(data);
     setIsOpen(true);
   };
 
@@ -357,12 +359,17 @@ const ChartContainer = ({ target, file, data, renderMap }) => {
   return (
     <div>
       <ChartComponent
+        renderMap={renderMap}
+        currentFloor={currentFloor}
+        handleModalInterractOpen = {handleModalInterractOpen}
+        data={data}
         target={target}
         file={file}
         svgfile={localStorage.getItem("filename")}
-        baseApiFile="http://127.0.0.1:8001/api"
+        baseApiFile={apiUrl}
       />
-      {isOpen && <InformationModal data={target} onClose={handleModalInterractClose} />}
+       {/* <InterractModal defaultFloorplans={defaultFloorplans} isOpen={isOpen} infos={infos} onClose={handleModalInterractClose} handleUserClicked={handleUserClicked}/> */}
+      {isOpen && <InformationModal infos={targetUnit} handleUserClicked={handleUserClicked} data={data} onClose={handleModalInterractClose} />}
     </div>
   );
 };

@@ -8,12 +8,13 @@ const AnalyticPage = () => {
   const [data, setData] = useState([]); // Store API data
   const [loading, setLoading] = useState(true); // Loading state
   const [error, setError] = useState(null); // Error state
-  
+  const baseApiUrl = import.meta.env.VITE_API_URL_ANALYTICS;
+
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const response = await axios.get("http://127.0.0.1:8001/api/analytics"); // Adjust API URL if needed
+        const response = await axios.get(baseApiUrl); // Adjust API URL if needed
         setData(response.data);
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -41,9 +42,14 @@ const AnalyticPage = () => {
 
   useEffect(() => {
     if (!data.length || loading || error) return;
-
+  
     const chart = echarts.init(chartRef.current);
-
+  
+    // Handling xAxis labels to prevent overlap and ensure readability
+    const axisLabels = filteredData.length > 0 
+      ? filteredData.map((item) => `${item.room}`) 
+      : ["No Data"];
+  
     const option = {
       title: {
         text: `Most Visited Rooms by ${filter}`,
@@ -54,17 +60,17 @@ const AnalyticPage = () => {
       },
       xAxis: {
         type: "category",
-        data: filteredData.length > 0 ? filteredData.map((item) => `${item.room}`) : ["No Data"],
+        data: axisLabels,
         axisLabel: {
-          rotate: 0, // Keep text horizontal
-          interval: 0, // Show all labels
+          rotate: axisLabels.length > 10 ? 45 : 0, // Rotate only if there are too many labels
+          interval: axisLabels.length > 10 ? Math.floor(axisLabels.length / 10) : 0, // Show only a subset of labels for large data
           fontSize: 12, // Adjust font size if needed
           formatter: function (value) {
+            // Truncate long labels
             return value.length > 10 ? value.substring(0, 10) + "\n" + value.substring(10) : value;
-          }
-        }
+          },
+        },
       },
-      
       yAxis: {
         type: "value",
       },
@@ -79,13 +85,16 @@ const AnalyticPage = () => {
         },
       ],
     };
-
+  
+    // Set the chart options
     chart.setOption(option);
-
+  
+    // Clean up on component unmount
     return () => {
       chart.dispose();
     };
   }, [filter, filteredData]);
+  
 
   return (
     <div className="flex">

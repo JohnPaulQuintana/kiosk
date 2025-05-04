@@ -1,7 +1,10 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-
+import Swal from "sweetalert2";
+import axios from "axios";
 const LoginComponent = () => {
+  const apiUrl = import.meta.env.VITE_API_URL;
+  const frontUrl = import.meta.env.VITE_FRONTEND_URL;
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -26,7 +29,7 @@ const LoginComponent = () => {
     setLoading(true);
 
     try {
-      const response = await fetch("http://localhost:8001/api/login", {
+      const response = await fetch(`${apiUrl}/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
@@ -43,7 +46,7 @@ const LoginComponent = () => {
 
         // Redirect to the admin dashboard
         setTimeout(() => {
-          navigate("/dashboard/home");
+          navigate("/dashboard/floor");
         }, 3000); // Optional delay for showing success message
       } else {
         setError(data.message || "Login failed. Please try again.");
@@ -56,6 +59,65 @@ const LoginComponent = () => {
         setSuccess([]);
       }, 3000);
     }
+  };
+
+
+  const handleResetPassword = () => {
+    Swal.fire({
+      title: "Enter your email address",
+      input: "email",
+      inputLabel: "Email address",
+      inputPlaceholder: "Enter your email",
+      showCancelButton: true,
+      confirmButtonText: "Send Reset Link",
+      cancelButtonText: "Cancel",
+      inputValidator: (value) => {
+        if (!value) {
+          return "Email is required!";
+        }
+        return null;
+      },
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        const email = result.value;
+        const url = `${frontUrl}reset`
+        setLoading(true);
+        try {
+          const response = await fetch(`${apiUrl}/reset-password`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email,url }),
+          });
+
+          const data = await response.json();
+
+          if (response.ok) {
+            Swal.fire({
+              title: "Success!",
+              text: "A password reset link has been sent to your email.",
+              icon: "success",
+              confirmButtonText: "OK",
+            });
+          } else {
+            Swal.fire({
+              title: "Error!",
+              text: data.message || "Failed to send reset link. Please try again.",
+              icon: "error",
+              confirmButtonText: "OK",
+            });
+          }
+        } catch (err) {
+          Swal.fire({
+            title: "Error!",
+            text: "An error occurred. Please try again later.",
+            icon: "error",
+            confirmButtonText: "OK",
+          });
+        } finally {
+          setLoading(false);
+        }
+      }
+    });
   };
 
   return (
@@ -122,6 +184,7 @@ const LoginComponent = () => {
           </div>
           <div className="flex items-center justify-end mb-4">
             <a
+            onClick={handleResetPassword}
               href="#"
               className="border-b-2 border-gray-300 text-red-700 hover:text-red-900 hover:border-red-700"
             >
@@ -136,6 +199,7 @@ const LoginComponent = () => {
               {loading ? "Logging in..." : "Login"}
             </button>
           </div>
+
         </form>
       </div>
     </div>

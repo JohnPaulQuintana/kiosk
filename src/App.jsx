@@ -12,6 +12,8 @@ import DashboardLayout from './app/admin/layouts/DashboardLayout';  // Import th
 import AnnouncementPage from './app/admin/pages/AnnouncementPage';
 import AnalyticPage from './app/admin/pages/AnalyticPage';
 import TeacherSchedule from './app/admin/pages/TeacherSchedule';
+import Announcement from './app/kiosk/Announcement';
+import ResetPasswordForm from './app/admin/components/ResetPasswordForm';
 
 function App() {
   const token = localStorage.getItem("authToken"); // Get token from localStorage
@@ -21,7 +23,9 @@ function App() {
       <Routes>
         {/* Public Routes */}
         <Route path="/" element={<Home />} />
-        <Route path="/navigation" element={<NavigationPage />} />
+        <Route path="/navigation/ground" element={<NavigationPage />} />
+        <Route path="/announcement" element={<Announcement />} />
+        <Route path="/reset" element={<ResetPasswordForm />} />
 
         {/* Redirect to dashboard if already authenticated */}
         <Route

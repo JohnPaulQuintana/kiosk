@@ -11,7 +11,7 @@ const MainSection = () => {
                 <div className="mt-2 lg:mt-4">
                     <p className="">Design And Development of An On-Campus Navigational Kiosk with Wayfinding and Notification System.</p>
                 </div>
-                <Link to={"/navigation"} className="mt-4 bg-red-700 p-1 mb-2 text-white rounded-md animate-infiniteScale">Getting Started?</Link>
+                <Link to={"/navigation/ground"} className="mt-4 bg-red-700 p-1 mb-2 text-white rounded-md animate-infiniteScale">Getting Started?</Link>
             </div>
 
             {/* Image */}

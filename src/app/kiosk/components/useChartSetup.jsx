@@ -10,11 +10,11 @@ const useChartSetup = (svgfile, target, baseApiFile) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalData, setModalData] = useState(null);
   const [showInterractMap, setShowInterractMap] = useState(false);
-  let myChart;
+  const myChartRef = useRef(null); // Updated to useRef
   let isDragging = false;
   let startX = 0;
   let startY = 0;
-  let zoomLevel = 10; // Default zoom level
+  let zoomLevel = 1.2; // Default zoom level
   let prevTouchDistance = 0;
 
   useEffect(() => {
@@ -41,18 +41,20 @@ const useChartSetup = (svgfile, target, baseApiFile) => {
       if (!shortestPath || shortestPath.length === 0) return;
 
       const dom = document.getElementById("chart-container");
-      myChart = echarts.init(dom, "", { renderer: "svg" });
+      myChartRef.current = echarts.init(dom, "", { renderer: "svg" }); // Assign chart to ref
+      const myChart = myChartRef.current;
 
       $.get(`${baseApiFile}${svgfile}`, (svg) => {
-        echarts.registerMap("CustomMap", { svg });
+        echarts.registerMap("CustomMap", { svg, useDirty: false, touchEvents: true });
         const routeCoords = shortestPath.map((item) => [item.x + 2, item.y + 2]);
         const targetCoord = routeCoords[routeCoords.length - 1];
 
         const option = {
           geo: {
             map: "CustomMap",
-            roam: false, // Disable default roam functionality
-            center: routeCoords[routeCoords.length - 1],
+            roam: true,
+            // roam: "move", // Disable default roam functionality
+            // center: routeCoords[routeCoords.length - 1],
             zoom: zoomLevel,
           },
           series: [
@@ -88,7 +90,7 @@ const useChartSetup = (svgfile, target, baseApiFile) => {
                 color: "#fff",
               },
               tooltip: { show: false, formatter: `{b}`, backgroundColor: "rgba(0, 0, 0, 0.7)" },
-              data: [{ name: target.unit, value: targetCoord }],
+              data: [{ name: target.unit, value: targetCoord }], // Target point data
             },
           ],
         };
@@ -112,59 +114,59 @@ const useChartSetup = (svgfile, target, baseApiFile) => {
       });
 
       // Touch Events for dragging
-      const handleTouchStart = (e) => {
-        e.preventDefault();
-        if (e.touches.length === 1) {
-          isDragging = true;
-          const touch = e.touches[0];
-          startX = touch.clientX;
-          startY = touch.clientY;
-        } else if (e.touches.length === 2) {
-          prevTouchDistance = getTouchDistance(e.touches);
-        }
-      };
+      // const handleTouchStart = (e) => {
+      //   e.preventDefault();
+      //   if (e.touches.length === 1) {
+      //     isDragging = true;
+      //     const touch = e.touches[0];
+      //     startX = touch.clientX;
+      //     startY = touch.clientY;
+      //   } else if (e.touches.length === 2) {
+      //     prevTouchDistance = getTouchDistance(e.touches);
+      //   }
+      // };
 
-      const handleTouchMove = (e) => {
-        if (isDragging && e.touches.length === 1) {
-          const touch = e.touches[0];
-          const dx = touch.clientX - startX;
-          const dy = touch.clientY - startY;
-          myChart.dispatchAction({
-            type: "geoRoam",
-            dx,
-            dy,
-          });
-          startX = touch.clientX;
-          startY = touch.clientY;
-        } else if (e.touches.length === 2) {
-          const newTouchDistance = getTouchDistance(e.touches);
-          const scale = newTouchDistance / prevTouchDistance;
-          zoomLevel *= scale;
-          myChart.setOption({
-            geo: { zoom: zoomLevel },
-          });
-          prevTouchDistance = newTouchDistance;
-        }
-      };
+      // const handleTouchMove = (e) => {
+      //   if (isDragging && e.touches.length === 1) {
+      //     const touch = e.touches[0];
+      //     const dx = touch.clientX - startX;
+      //     const dy = touch.clientY - startY;
+      //     myChart.dispatchAction({
+      //       type: "geoRoam",
+      //       dx,
+      //       dy,
+      //     });
+      //     startX = touch.clientX;
+      //     startY = touch.clientY;
+      //   } else if (e.touches.length === 2) {
+      //     const newTouchDistance = getTouchDistance(e.touches);
+      //     const scale = newTouchDistance / prevTouchDistance;
+      //     zoomLevel *= scale;
+      //     myChart.setOption({
+      //       geo: { zoom: zoomLevel },
+      //     });
+      //     prevTouchDistance = newTouchDistance;
+      //   }
+      // };
 
-      const handleTouchEnd = (e) => {
-        if (e.touches.length === 0) {
-          isDragging = false;
-        }
-      };
+      // const handleTouchEnd = (e) => {
+      //   if (e.touches.length === 0) {
+      //     isDragging = false;
+      //   }
+      // };
 
       // Calculate the distance between two touches
-      const getTouchDistance = (touches) => {
-        const dx = touches[0].clientX - touches[1].clientX;
-        const dy = touches[0].clientY - touches[1].clientY;
-        return Math.sqrt(dx * dx + dy * dy);
-      };
+      // const getTouchDistance = (touches) => {
+      //   const dx = touches[0].clientX - touches[1].clientX;
+      //   const dy = touches[0].clientY - touches[1].clientY;
+      //   return Math.sqrt(dx * dx + dy * dy);
+      // };
 
       // Add touch event listeners to chart container
-      const chartContainer = document.getElementById("chart-container");
-      chartContainer.addEventListener("touchstart", handleTouchStart, { passive: false });
-      chartContainer.addEventListener("touchmove", handleTouchMove, { passive: false });
-      chartContainer.addEventListener("touchend", handleTouchEnd, { passive: false });
+      // const chartContainer = document.getElementById("chart-container");
+      // chartContainer.addEventListener("touchstart", handleTouchStart, { passive: false });
+      // chartContainer.addEventListener("touchmove", handleTouchMove, { passive: false });
+      // chartContainer.addEventListener("touchend", handleTouchEnd, { passive: false });
     };
 
     if (svgLoaded) {
@@ -172,7 +174,10 @@ const useChartSetup = (svgfile, target, baseApiFile) => {
     }
 
     return () => {
-      if (myChart) myChart.dispose();
+      if (myChartRef.current) {
+        myChartRef.current.dispose();
+        myChartRef.current = null;
+      }
     };
   }, [svgLoaded, target]);
 

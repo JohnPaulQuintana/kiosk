@@ -63,9 +63,12 @@ z-index: 9999999 !important; /* You can adjust this value as needed */
 } */
 
 .chart-container {
-  touch-action: none; /* Disable pinch-to-zoom and browser gestures */
+  /* touch-action: none; Disable pinch-to-zoom and browser gestures */
+  
 }
-
+ .chart-container svg{
+  /* overflow: visible; */
+ }
 #image-viewer div {
   position: fixed;
   z-index: 9999;
@@ -112,8 +115,35 @@ z-index: 9999999 !important; /* You can adjust this value as needed */
   opacity: 0.8;
 }
 
-@media  screen and (max-width: 700px) {
+/* @media  screen and (max-width: 700px) {
   .viewer {
     width: 100%;
   }
+} */
+
+/* .walker {
+  transition: transform 0.2s ease-out;
+  transform-origin: center;
+  animation: walkBounce 0.6s infinite ease-in-out;
+} */
+
+/* @keyframes walkBounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+} */
+
+@keyframes fillColorChange {
+  0% {
+    fill: initial; /* Initial color */
+  }
+  50% {
+    fill: green; /* Color at the halfway point */
+  }
+  100% {
+    fill: initial; /* Reset to initial color */
+  }
+}
+
+.animate-fill {
+  animation: fillColorChange 1s ease-in-out infinite; /* Infinite animation */
 }

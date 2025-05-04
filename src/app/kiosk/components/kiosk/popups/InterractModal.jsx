@@ -1,9 +1,11 @@
 import { info } from "autoprefixer";
 import React from "react";
 
-const InterractModal = ({ isOpen, infos, onClose }) => {
+const InterractModal = ({ defaultFloorplans,isOpen, infos, onClose, handleUserClicked }) => {
+    // console.log(defaultFloorplans[0]?.units)
     if (!isOpen) return null;
-
+    const result = defaultFloorplans[0]?.units.filter(unit => unit?.unit === infos?.unit);
+    console.log(result)
     return (
         <div className="fixed inset-0 bg-black bg-opacity-75 z-[99999] flex justify-center items-center">
             <div className="bg-slate-800 p-2 w-[60%] relative">
@@ -19,7 +21,7 @@ const InterractModal = ({ isOpen, infos, onClose }) => {
                         <h2 className="text-white">{infos.color}</h2>
                     </div>
                     <div className="w-full mt-2">
-                        <button type="button" className="bg-green-500 p-2 text-white rounded-sm">Navigate</button>
+                        <button onClick={()=>handleUserClicked(result[0], '')} type="button" className="bg-green-500 p-2 text-white rounded-sm">Navigate</button>
                     </div>
                 </div>
             </div>

@@ -10,7 +10,7 @@ const Sidebar = () => {
 
   const handleLogout = async () => {
     const token = localStorage.getItem("authToken");
-    const apiEndpoint = "http://localhost:8001/api/logout";
+    const apiEndpoint = import.meta.env.VITE_API_URL;
 
     const shouldClearToken = await logout(apiEndpoint, token);
 
@@ -20,8 +20,8 @@ const Sidebar = () => {
   };
 
   const navItems = [
-    { id: "home", label: "Home", icon: "fa-house", url: "/dashboard/home" },
-    { id: "navigation", label: "Navigation Floor", icon: "fa-chart-tree-map", url: "/dashboard/floor" },
+    // { id: "home", label: "Home", icon: "fa-house", url: "/dashboard/home" },
+    { id: "navigation", label: "Navigation", icon: "fa-chart-tree-map", url: "/dashboard/floor" },
     { id: "announcement", label: "Announcement", icon: "fa-megaphone", url: "/dashboard/announcement" },
     { id: "teachers", label: "Teacher", icon: "fa-megaphone", url: "/dashboard/teachers" },
     { id: "analytics", label: "Analytics", icon: "fa-megaphone", url: "/dashboard/analytics" },

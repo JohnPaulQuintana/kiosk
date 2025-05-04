@@ -1,5 +1,5 @@
 // Main function to calculate the shortest path with edges.
-export const calculateShortestPathWithEdges = (svgElement2, target) => {
+export const calculateShortestPathWithEdges = (target) => {
     // console.log(target);
     
     // Split the target string to determine the floor (indicator)
@@ -257,5 +257,5 @@ const calculateShortestPath = (nodes, startNode, endNode, threshold) => {
 const getDistance = (nodeA, nodeB) => {
     const dx = (nodeA.x - nodeB.x);  // Calculate the difference in x-coordinates.
     const dy = (nodeA.y - nodeB.y);  // Calculate the difference in y-coordinates.
-    return Math.sqrt(dx * dx + dy * dy) - 15;  // Return the Euclidean distance.
+    return Math.sqrt(dx * dx + dy * dy) - 12;  // Return the Euclidean distance.
 };

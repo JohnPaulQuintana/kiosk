@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 
 const SVGLoader = ({ filePath, onLoad }) => {
-  let baseApiUrl = "http://127.0.0.1:8001/api";
+  let baseApiUrl = import.meta.env.VITE_API_URL;
   // Check if the filename in localStorage is the same as the new filePath
   const storedFileName = localStorage.getItem("filename");
   useEffect(() => {
