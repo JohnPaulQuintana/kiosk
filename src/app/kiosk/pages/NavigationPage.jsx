@@ -146,34 +146,34 @@ const NavigationPage = () => {
 
       console.log("API response:", response.data);
       const teacherData = response.data.teacher; // This contains the teacher info
-      if (teacherData && Object.keys(teacherData).length > 0) {
-        // Add a delay (e.g., 1 second) before displaying the Swal modal
-        setTimeout(() => {
-          Swal.fire({
-            icon: "success",
-            title: "Teacher Created Successfully",
-            html: `
-        <div class="flex flex-col gap-2 items-start">
-          <span><strong>Name:</strong> ${teacherData.name}</span>
-          <span><strong>Email:</strong> ${teacherData.email}</span>
-          <span><strong>Floor:</strong> ${teacherData.floor}</span>
-          <span><strong>Teacher Schedules:</strong></span>
-          <img src="${baseApiUrl}/storage/${
-              teacherData.file_path
-            }" alt="Teacher's File" style="max-width: 100%; max-height: 400px; object-fit: contain;" /> <br>
-          <strong>Created:</strong> ${new Date(
-            teacherData.created_at
-          ).toLocaleString()} <br>
-          <strong>Updated:</strong> ${new Date(
-            teacherData.updated_at
-          ).toLocaleString()} <br>
-        </div>
-      `,
-            showConfirmButton: true,
-            allowOutsideClick: false, // Disable clicking outside to close the modal
-          });
-        }, 5000); // Delay of 1 second (1000ms)
-      }
+      // if (teacherData && Object.keys(teacherData).length > 0) {
+      //   // Add a delay (e.g., 1 second) before displaying the Swal modal
+      //   setTimeout(() => {
+      //     Swal.fire({
+      //       icon: "success",
+      //       title: "Teacher Created Successfully",
+      //       html: `
+      //   <div class="flex flex-col gap-2 items-start">
+      //     <span><strong>Name:</strong> ${teacherData.name}</span>
+      //     <span><strong>Email:</strong> ${teacherData.email}</span>
+      //     <span><strong>Floor:</strong> ${teacherData.floor}</span>
+      //     <span><strong>Teacher Schedules:</strong></span>
+      //     <img src="${baseApiUrl}/storage/${
+      //         teacherData.file_path
+      //       }" alt="Teacher's File" style="max-width: 100%; max-height: 400px; object-fit: contain;" /> <br>
+      //     <strong>Created:</strong> ${new Date(
+      //       teacherData.created_at
+      //     ).toLocaleString()} <br>
+      //     <strong>Updated:</strong> ${new Date(
+      //       teacherData.updated_at
+      //     ).toLocaleString()} <br>
+      //   </div>
+      // `,
+      //       showConfirmButton: true,
+      //       allowOutsideClick: false, // Disable clicking outside to close the modal
+      //     });
+      //   }, 5000); // Delay of 1 second (1000ms)
+      // }
 
     } catch (error) {
       console.error("API request failed:", error);
