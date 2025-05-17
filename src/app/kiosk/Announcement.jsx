@@ -100,8 +100,8 @@ const Announcement = () => {
           ? "fixed inset-0 z-40 bg-white p-4 overflow-y-auto"
           : "hidden"
       } 
-      md:col-span-1 rounded-2xl shadow-md h-full
-    `}
+        md:col-span-1 rounded-2xl shadow-md h-full
+      `}
           >
             {/* Close button on mobile */}
             <div className="flex justify-between items-center md:hidden mb-4">
@@ -156,8 +156,8 @@ const Announcement = () => {
           {/* Main Content */}
           <div className="md:col-span-2 w-full bg-white rounded-2xl shadow-md p-8 h-full relative">
             {selected ? (
-              <div className="grid grid-cols-1 lg:grid-cols-2 items-center justify-center gap-5 h-full w-full">
-                <div className="relative mb-4 w-full">
+              <div className="h-full w-full">
+                <div className="relative mb-4 w-full h-fit">
                   <img
                     src={
                       `${baseApiUrl}/storage/${selected.image.replace(
@@ -166,20 +166,21 @@ const Announcement = () => {
                       )}` || DEFAULT_IMAGE
                     }
                     alt={selected.title}
-                    className="w-full h-[300px] border object-cover rounded-md"
+                    className="w-full h-[500px] border object-cover rounded-md"
                   />
+                  
                   {isNew(selected.created_at) && (
                     <span className="absolute top-2 right-2 text-sm bg-red-500 text-white px-2 py-1 rounded-full shadow">
                       NEW
                     </span>
                   )}
                 </div>
-                <div className="flex flex-col gap-2 w-full">
+                <div className="flex flex-col gap-2 w-full border">
                   <h1 className="text-4xl font-bold text-gray-800 mb-1 break-words">
                     {selected.title}
                   </h1>
                   <p className="text-base text-gray-700 break-words">
-                    {selected.description}
+                    {selected.description} 
                   </p>
                   <p className="text-sm text-gray-500 mb-2">
                     {formatDate(selected.created_at)}
