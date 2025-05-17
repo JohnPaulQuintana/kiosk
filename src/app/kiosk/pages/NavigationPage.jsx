@@ -9,8 +9,11 @@ import InterractModal from "../components/kiosk/popups/InterractModal";
 import TeacherModal from "../components/TeacherModal";
 import { calculateShortestPathWithEdges } from "../customHook/pathCalculation";
 // import facilities from "../data/facilities";
+const DEFAULT_IMAGE = "/resources/logo/navigation.png";
 
 const NavigationPage = () => {
+  const excludedKeywords = ["kiosk", "gate", "main", "stairs", "ce building", "ab2-301 storage"];
+  const [teacherTabs, setTeacherTabs] = useState('')
   const [sideClick, setSideClick] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [renderMap, setRenderMap] = useState(false);
@@ -304,9 +307,13 @@ const NavigationPage = () => {
                 {filteredFloorplans.length > 0 ? (
                   filteredFloorplans.map((plan, index) =>
                     plan.units
-                    .filter((unit) =>
-                        unit.unit.toLowerCase().includes(searchTerm.toLowerCase())
-                    )
+                    .filter((unit) => {
+                        // unit.unit.toLowerCase().includes(searchTerm.toLowerCase())
+                      const unitName = unit.unit.toLowerCase();
+                      const matchesSearch = unitName.includes(searchTerm.toLowerCase());
+                      const isExcluded = excludedKeywords.some((word) => unitName.includes(word));
+                      return matchesSearch && !isExcluded;
+                    })
                     .map((unit, unitIndex) => (
                       <div
                         className={`${
@@ -413,13 +420,15 @@ const NavigationPage = () => {
                         </div>
                         <div className="border rounded-md w-16 h-16 overflow-hidden">
                           <img
-                            src={`${baseApiUrl}/storage/${unit?.image?.replace(
-                              "public",
-                              ""
-                            )}`}
-                            alt=""
-                            className="w-full h-full object-cover"
-                          />
+                              src={
+                                unit?.image
+                                  ? `${baseApiUrl}/storage/${unit.image.replace("public", "")}`
+                                  : DEFAULT_IMAGE
+                              }
+                              alt=""
+                              className="w-full h-full object-cover"
+                            />
+
                         </div>
                       </div>
                       

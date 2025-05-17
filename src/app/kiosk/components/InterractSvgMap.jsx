@@ -5,7 +5,7 @@ const InterractSvgMap = ({ onOpen, currentFloor, floorplans,shortestPath,trimmed
   const baseApiUrl = import.meta.env.VITE_API_URL;
   const svgContainerRef = useRef(null); // Reference to the container that holds the SVG
   const svgRef = useRef(null); // Reference to the SVG itself
-  const [zoom, setZoom] = useState(0.3); // Initial zoom level
+  const [zoom, setZoom] = useState(0.2); // Initial zoom level
   const [pan, setPan] = useState({ x: 0, y: 0 }); // Initial pan position
   const touchStart = useRef({ x: 0, y: 0 }); // For tracking initial touch position
   const initialZoom = useRef(0.1); // Store the initial zoom level for pinch gesture
@@ -175,7 +175,7 @@ const InterractSvgMap = ({ onOpen, currentFloor, floorplans,shortestPath,trimmed
           // 4. Force a reflow if needed (for stubborn cases)
           void element.offsetHeight;
         });
-        
+        console.log(trimmedTarget)
         const tElement = svgElement.querySelector(
             `[id="${CSS.escape(trimmedTarget)}"]`
           );
@@ -281,7 +281,7 @@ const InterractSvgMap = ({ onOpen, currentFloor, floorplans,shortestPath,trimmed
             // ... walker setup
             walker.setAttribute(
               "href",
-              "https://png.pngtree.com/png-vector/20220610/ourmid/pngtree-man-walking-forward-semi-flat-rgb-color-vector-illustration-png-image_4971208.png"
+              "/walker.png"
             ); // Replace with your image path
             walker.setAttribute("width", "100");
             walker.setAttribute("height", "100");

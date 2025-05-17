@@ -36,6 +36,10 @@ export const calculateShortestPathWithEdges = (target) => {
             process = 3; // Third maps to 3
             pathGroupSelector.push(["Path","Path2","Path3"])
             break;
+        case 'fourth':
+            process = 4; // Any other value maps to 4
+            pathGroupSelector.push(["Path","Path2","Path3","Path4"])
+            break;
         default:
             process = 4; // Any other value maps to 4
             pathGroupSelector.push(["Path","Path2","Path3","Path4"])
@@ -58,7 +62,7 @@ export const calculateShortestPathWithEdges = (target) => {
         // Select the path group corresponding to the current floor/level
         let pathGroup = svgElement.querySelector(`[id="${pathGroupSelector[0][index-1]}"]`);
         // console.log(`${pathGroupSelector[0][index-1]}`)
-        // console.log(pathGroup)
+        console.log(pathGroup)
         
         // Select the kiosk (starting point) for this level
         let kiosk = svgElement.querySelector(`${index > 1 ? "#ground_"+result[1]+"_stairs_a_door1" : "#kiosk"}`);
@@ -70,6 +74,7 @@ export const calculateShortestPathWithEdges = (target) => {
         // Process the path group (all rectangles within the path).
         if (pathGroup) {
             let rects = pathGroup.querySelectorAll("rect"); // Get all rectangles.
+            console.log(rects)
             rects.forEach((rect) => {
                 let id = rect.id || "No ID";  // Default to "No ID" if no ID is found.
                 let x = parseFloat(rect.getAttribute("x")) || 0;  // Get the x-coordinate.
@@ -94,10 +99,13 @@ export const calculateShortestPathWithEdges = (target) => {
         }
         // console.log(startNode);
         let endNode = nodes.find((node) => node.id.trim().toLowerCase() === target.trim().toLowerCase());
+        console.log("End Node",endNode )
+        console.log("target Node: ",target, nodes)
         if (!endNode) {
             // Fallback if the end node wasn't found by its exact target ID
-            // console.log('yes')
+            console.log(result)
             endNode = nodes.find((node) => node.id.trim().toLowerCase() === `ground_${result[1]}_stairs_a_door1`)
+            console.log("End Node 2", endNode)
             if(!endNode){
                 endNode = nodes.find((node) => node.id.trim().toLowerCase() === `ground_stairs_${result[1]}_a_door1`)
             }
@@ -132,6 +140,7 @@ export const calculateShortestPathWithEdges = (target) => {
         console.log(`Threshold: ${threshold}`);
 
         // Call the function to calculate the shortest path.
+        console.log(nodes, startNode, endNode, threshold)
         let shortestPathResult = calculateShortestPath(nodes, startNode, endNode, threshold);
         console.log(shortestPathResult)
 
