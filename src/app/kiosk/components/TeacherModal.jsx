@@ -21,6 +21,7 @@ const TeacherModal = ({ isOpen, onClose, teachers, handleUserClicked }) => {
           <p class="text-sm text-gray-500">${new Date(selected_teacher.created_at).toLocaleString()}</p>
         </div>
       `,
+       width: '80%',    
       showCloseButton: true,
       focusConfirm: false,
       confirmButtonText: "Navigate",
