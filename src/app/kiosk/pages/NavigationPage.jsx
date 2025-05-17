@@ -12,16 +12,8 @@ import { calculateShortestPathWithEdges } from "../customHook/pathCalculation";
 const DEFAULT_IMAGE = "/resources/logo/navigation.png";
 
 const NavigationPage = () => {
-  const excludedKeywords = [
-    "kiosk",
-    "gate",
-    "main",
-    "stairs",
-    "ce building",
-    "ab2-301 storage",
-  ];
-  const [teacherTabs, setTeacherTabs] = useState([]);
-  const [teacherTabsNow, setTeacherTabsNow] = useState([]);
+  const excludedKeywords = ["kiosk", "gate", "main", "stairs", "ce building", "ab2-301 storage"];
+  const [teacherTabs, setTeacherTabs] = useState('')
   const [sideClick, setSideClick] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [renderMap, setRenderMap] = useState(false);
@@ -104,20 +96,6 @@ const NavigationPage = () => {
   };
 
   useEffect(() => {
-    const collected = [];
-
-    filteredFloorplans.forEach((plan) => {
-      plan.units.forEach((unit) => {
-        if (unit.teachers && unit.teachers.length > 0) {
-          collected.push(unit.unit);
-        }
-      });
-    });
-
-    setTeacherTabs(collected);
-  }, [filteredFloorplans]);
-
-  useEffect(() => {
     const savedFormattedIds = JSON.parse(localStorage.getItem("floor-data"));
     if (savedFormattedIds) {
       // console.log("Loaded IDs from localStorage:", savedFormattedIds);
@@ -133,19 +111,16 @@ const NavigationPage = () => {
 
   const handleUserClicked = useCallback(async (target, teacher_id) => {
     console.log("Teacher ID", teacher_id);
-
     // alert(target.door)
     // ""second_basketball_court_and_stage_door1""
     console.log(target);
     // calculate the shortest path
-    const { shortestPath, blockedPaths } = calculateShortestPathWithEdges(
-      target.door
-    );
-    if (!shortestPath || shortestPath.length === 0)
-      console.log("No path found.");
+    const { shortestPath, blockedPaths } = calculateShortestPathWithEdges(target.door);
+    if (!shortestPath || shortestPath.length === 0) console.log("No path found.");
     setShortestPath(shortestPath);
     // Remove the first word and the underscore, remove words starting with "door", then replace underscores with spaces and convert to uppercase
-    const result = target.door.replace(/^([^\s_]+)_|_door\w+/g, ""); // Remove first word + underscore and "door" words
+    const result = target.door
+    .replace(/^([^\s_]+)_|_door\w+/g, "")   // Remove first word + underscore and "door" words
     // .replace(/_/g, " ")                     // Replace underscores with spaces
     // .toUpperCase();                         // Convert the string to uppercase
 
@@ -202,6 +177,7 @@ const NavigationPage = () => {
       //     });
       //   }, 5000); // Delay of 1 second (1000ms)
       // }
+
     } catch (error) {
       console.error("API request failed:", error);
     }
@@ -232,7 +208,6 @@ const NavigationPage = () => {
   }, []); // Empty dependency array ensures it runs once when the component mounts
 
   const handleFloorChange = (floor) => {
-    setTeacherTabsNow([])
     const defaultFloor = "GROUND FLOOR"; // Ensure default is set to "Ground Floor"
 
     // Set the floor and active nav dynamically based on user selection
@@ -257,11 +232,6 @@ const NavigationPage = () => {
     setIsModalOpen(false);
   };
 
-  console.log("teachers: ", teacherTabs);
-  const handleTeacherTab = () => {
-
-    setTeacherTabsNow(teacherTabs)
-  }
   return (
     <div className="w-full h-screen relative">
       {/* Header */}
@@ -293,7 +263,7 @@ const NavigationPage = () => {
                 floorplans.map((collection, index) => (
                   <button
                     key={index}
-                    className={`py-2 mr-2 rounded-md text-sm border p-2 ${
+                    className={`py-2 mr-2 rounded-md text-sm ${
                       activeNav === collection.floor
                         ? "text-green-500"
                         : "text-white"
@@ -317,14 +287,6 @@ const NavigationPage = () => {
               )}
             </div>
             <div className="text-xs ps-4 capitalize text-white flex items-center gap-2 mb-2">
-              <button className="py-2 mr-2 rounded-md text-sm border p-2"
-              onClick={handleTeacherTab}>
-                <i className={`fa-solid fa-triangle rotate-90 text-sm`}></i>
-                  {" "}
-                <span className="uppercase text-bold">Available Teacher</span>
-              </button>
-            </div>
-            <div className="text-xs ps-4 capitalize text-white flex items-center gap-2 mb-2">
               <span>
                 <i className="fa-solid fa-circle text-green-500 opacity-80"></i>{" "}
                 Available option for{" "}
@@ -345,150 +307,132 @@ const NavigationPage = () => {
                 {filteredFloorplans.length > 0 ? (
                   filteredFloorplans.map((plan, index) =>
                     plan.units
-                      .filter((unit) => {
+                    .filter((unit) => {
                         // unit.unit.toLowerCase().includes(searchTerm.toLowerCase())
-                        const unitName = unit.unit.toLowerCase();
-                        const searchKeywords = searchTerm.toLowerCase().split(" ");
-                        const matchesSearch = searchKeywords.some(keyword => unitName.includes(keyword));
-                        // const matchesSearch = unitName.includes(
-                        //   searchTerm.toLowerCase()
-                        // );
-                        const isExcluded = excludedKeywords.some((word) =>
-                          unitName.includes(word)
-                        );
-                        return matchesSearch && !isExcluded;
-                      })
-                      // addition filter for teacher button
-                      .filter(unit => {
-                        if (teacherTabsNow.length === 0) return true; // no filtering by teacherTabs if empty
-                        return teacherTabsNow.includes(unit.unit);   // else filter by teacherTabs
-                      })
-                      .map((unit, unitIndex) => (
-                        <div
-                          className={`${
-                            selectedItem.door === unit.door
-                              ? "bg-green-500"
-                              : ""
-                          } p-2 mb-4 shadow rounded-md flex items-center justify-between transform transition-transform duration-300 hover:scale-105`}
-                          key={unit.id}
-                        >
-                          <div className="w-[80%]">
-                            <span
+                      const unitName = unit.unit.toLowerCase();
+                      const matchesSearch = unitName.includes(searchTerm.toLowerCase());
+                      const isExcluded = excludedKeywords.some((word) => unitName.includes(word));
+                      return matchesSearch && !isExcluded;
+                    })
+                    .map((unit, unitIndex) => (
+                      <div
+                        className={`${
+                          selectedItem.door === unit.door ? "bg-green-500" : ""
+                        } p-2 mb-4 shadow rounded-md flex items-center justify-between transform transition-transform duration-300 hover:scale-105`}
+                        key={unit.id}
+                      >
+                        <div className="w-[80%]">
+                          <span
+                            className={`${
+                              selectedItem.door === unit.door
+                                ? "text-white"
+                                : "text-white"
+                            } text-xs`}
+                          >
+                            <i
                               className={`${
                                 selectedItem.door === unit.door
                                   ? "text-white"
-                                  : "text-white"
-                              } text-xs`}
+                                  : "text-green-500"
+                              } fa-solid fa-circle opacity-80 text-xs`}
+                            ></i>{" "}
+                            <span className="">{plan.floor}</span>
+                          </span>
+                          <span
+                            className={`${
+                              selectedItem.door === unit.door
+                                ? "text-white"
+                                : "text-white"
+                            } block ps-4`}
+                          >
+                            {unit.unit}
+                          </span>
+                          <div className="flex gap-2 items-center ps-4 mt-2">
+                            <button
+                              onClick={() =>
+                                handleUserClicked(
+                                  {
+                                    door: "kiosk",
+                                    unit: "",
+                                    availability: true,
+                                    floor: "Ground Floor",
+                                    image: "",
+                                  },
+                                  plan
+                                )
+                              }
+                              type="button"
+                              className={`text-xs bg-red-500 border border-white rounded-sm text-white p-1 ${
+                                selectedItem.door === unit.door ? "" : "hidden"
+                              }`}
                             >
-                              <i
-                                className={`${
-                                  selectedItem.door === unit.door
-                                    ? "text-white"
-                                    : "text-green-500"
-                                } fa-solid fa-circle opacity-80 text-xs`}
-                              ></i>{" "}
-                              <span className="">{plan.floor}</span>
-                            </span>
-                            <span
-                              className={`${
-                                selectedItem.door === unit.door
-                                  ? "text-white"
-                                  : "text-white"
-                              } block ps-4`}
+                              Cancel
+                            </button>
+                            <button
+                              onClick={() => handleUserClicked(unit, "")}
+                              type="button"
+                              className={`text-xs bg-green-500 border border-white rounded-sm text-white p-1 ${
+                                unit.availability ? "" : "hidden"
+                              }`}
                             >
-                              {unit.unit}
-                            </span>
-                            <div className="flex gap-2 items-center ps-4 mt-2">
-                              <button
-                                onClick={() =>
-                                  handleUserClicked(
-                                    {
-                                      door: "kiosk",
-                                      unit: "",
-                                      availability: true,
-                                      floor: "Ground Floor",
-                                      image: "",
-                                    },
-                                    plan
-                                  )
-                                }
-                                type="button"
-                                className={`text-xs bg-red-500 border border-white rounded-sm text-white p-1 ${
-                                  selectedItem.door === unit.door
-                                    ? ""
-                                    : "hidden"
-                                }`}
-                              >
-                                Cancel
-                              </button>
-                              <button
-                                onClick={() => handleUserClicked(unit, "")}
-                                type="button"
-                                className={`text-xs bg-green-500 border border-white rounded-sm text-white p-1 ${
-                                  unit.availability ? "" : "hidden"
-                                }`}
-                              >
-                                Navigate
-                              </button>
-
-                              <button
-                                onClick={() => handleUserClickedTeacher(unit)}
-                                type="button"
-                                className={`text-xs bg-green-500 border border-white rounded-sm text-white p-1 ${
-                                  unit.availability && unit.teachers.length > 0
-                                    ? ""
-                                    : "hidden"
-                                }`}
-                              >
-                                Teachers
-                              </button>
-                            </div>
-                            <div className="mt-2 px-4">
-                              {selectedItem.door === unit.door && (
-                                <span className="flex items-center">
-                                  <svg
-                                    className="animate-spin h-5 w-5 text-white"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                  >
-                                    <circle
-                                      className="opacity-25"
-                                      cx="12"
-                                      cy="12"
-                                      r="10"
-                                      stroke="currentColor"
-                                      strokeWidth="4"
-                                    ></circle>
-                                    <path
-                                      className="opacity-75"
-                                      fill="currentColor"
-                                      d="M4 12a8 8 0 0116 0h2a10 10 0 10-20 0h2z"
-                                    ></path>
-                                  </svg>
-                                  <span className="ml-2 text-white text-[9px] capitalize">
-                                    Navigating to {unit.unit}...
-                                  </span>
-                                </span>
-                              )}
-                            </div>
+                              Navigate
+                            </button>
+                            
+                            <button
+                              onClick={() => handleUserClickedTeacher(unit)}
+                              type="button"
+                              className={`text-xs bg-green-500 border border-white rounded-sm text-white p-1 ${
+                                unit.availability && unit.teachers.length > 0 ? "" : "hidden"
+                              }`}
+                            >
+                              Teachers
+                            </button>
                           </div>
-                          <div className="border rounded-md w-16 h-16 overflow-hidden">
-                            <img
+                          <div className="mt-2 px-4">
+                            {selectedItem.door === unit.door && (
+                              <span className="flex items-center">
+                                <svg
+                                  className="animate-spin h-5 w-5 text-white"
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  fill="none"
+                                  viewBox="0 0 24 24"
+                                >
+                                  <circle
+                                    className="opacity-25"
+                                    cx="12"
+                                    cy="12"
+                                    r="10"
+                                    stroke="currentColor"
+                                    strokeWidth="4"
+                                  ></circle>
+                                  <path
+                                    className="opacity-75"
+                                    fill="currentColor"
+                                    d="M4 12a8 8 0 0116 0h2a10 10 0 10-20 0h2z"
+                                  ></path>
+                                </svg>
+                                <span className="ml-2 text-white text-[9px] capitalize">
+                                  Navigating to {unit.unit}...
+                                </span>
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                        <div className="border rounded-md w-16 h-16 overflow-hidden">
+                          <img
                               src={
                                 unit?.image
-                                  ? `${baseApiUrl}/storage/${unit.image.replace(
-                                      "public",
-                                      ""
-                                    )}`
+                                  ? `${baseApiUrl}/storage/${unit.image.replace("public", "")}`
                                   : DEFAULT_IMAGE
                               }
                               alt=""
                               className="w-full h-full object-cover"
                             />
-                          </div>
+
                         </div>
-                      ))
+                      </div>
+                      
+                    ))
                   )
                 ) : (
                   <div className="flex items-center justify-center">
@@ -556,7 +500,8 @@ const NavigationPage = () => {
             //   floorplans={defaultFloorplans}
             // />
             // <div className="h-screen w-full flex items-center justify-center border">Loading SVG...{defaultFloorplans.floor}</div> // Or any default component or message you want
-          )}
+          )
+          }
         </div>
       </div>
 
